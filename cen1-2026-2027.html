@@ -22,9 +22,10 @@
       --radius: 14px;
       --shadow: 0 12px 30px rgba(31, 41, 51, .08);
       --ue-neutral: #8b96a6;
+      --slot-min-height: clamp(92px, 10.5vw, 148px);
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; min-width: 0; }
 
     .roboto-200 {
       font-family: "Roboto", sans-serif;
@@ -48,7 +49,7 @@
       overflow-x: hidden;
       font-family: "Roboto", sans-serif;
       color: var(--ink);
-      background: #ccc;
+      background: var(--bg);
       line-height: 1.35;
     }
 
@@ -79,7 +80,7 @@
       letter-spacing: .08em;
       font-size: .76rem;
       font-weight: 700;
-      color: brown;
+      color: var(--accent);
     }
 
     h1 {
@@ -87,6 +88,31 @@
       font-size: clamp(1.45rem, 2.8vw, 2.45rem);
       line-height: 1.08;
     }
+
+    .start-dates {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      background: var(--accent-soft);
+      color: var(--ink);
+      font-size: clamp(.9rem, 1.4vw, 1rem);
+    }
+
+    .start-dates[hidden] { display: none; }
+
+    .start-dates-title {
+      margin: 0 0 4px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .start-dates-list {
+      display: grid;
+      gap: 3px;
+      margin: 0;
+    }
+
+    .start-dates-list div { overflow-wrap: anywhere; }
 
     .jump-menu {
       display: flex;
@@ -230,355 +256,337 @@
     }
 
     .table-wrap {
+      width: 100%;
       max-width: 100%;
-      min-width: 0;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fff;
       overflow-x: hidden;
     }
 
     table {
       width: 100%;
       max-width: 100%;
-      min-width: 0;
       border-collapse: collapse;
+      border-spacing: 0;
       table-layout: fixed;
     }
 
     th,
     td {
-      min-width: 0;
       border: 1px solid var(--line);
       vertical-align: top;
-      padding: 10px;
-      overflow-wrap: anywhere;
-      word-break: normal;
     }
 
-    thead th {
+    th {
       background: var(--accent-soft);
-      color: #1e3d5f;
-      font-weight: 800;
-      text-align: left;
+      color: var(--ink);
+      font-weight: 750;
     }
 
     .calendar {
-      --slot-min-height: clamp(84px, 8vw, 124px);
-      width: 100%;
-      font-size: clamp(.56rem, .38rem + .72vw, .93rem);
+      --calendar-font: clamp(.48rem, .28rem + .85vw, .82rem);
+      font-size: var(--calendar-font);
     }
 
-    .calendar th,
-    .calendar td {
-      padding: clamp(4px, .75vw, 10px);
-    }
-
-    .calendar tbody tr {
-      height: var(--slot-min-height);
-      min-height: var(--slot-min-height);
-    }
-
-    .slot-head,
-    .slot-cell {
-      background: #fafbfc;
-      color: var(--ink);
-      font-weight: 750;
-      text-align: left;
-    }
-
-    .slot-head,
-    .day-label {
+    .calendar thead th {
+      padding: clamp(2px, .6vw, 8px);
+      text-align: center;
       white-space: nowrap;
       overflow-wrap: normal;
       word-break: keep-all;
       hyphens: none;
     }
 
-    .slot-short,
-    .day-short { display: none; }
+    .calendar tbody tr { height: var(--slot-min-height); }
+
+    .slot-head,
+    .slot-cell {
+      text-align: center;
+      white-space: nowrap;
+    }
 
     .slot-cell {
-      line-height: 1.2;
-      font-variant-numeric: tabular-nums;
+      height: var(--slot-min-height);
+      padding: clamp(2px, .6vw, 8px);
+      background: #f9fafc;
+      vertical-align: middle;
     }
 
     .slot-label {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0 .3em;
-      align-items: baseline;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+      line-height: 1.05;
+      white-space: nowrap;
     }
+
+    .slot-separator { color: var(--muted); }
+
+    .day-label {
+      display: inline-block;
+      white-space: nowrap;
+      overflow-wrap: normal;
+      word-break: keep-all;
+      hyphens: none;
+    }
+
+    .day-short,
+    .slot-short { display: none; }
 
     .day-cell {
       height: var(--slot-min-height);
+      padding: clamp(2px, .5vw, 7px);
       background: #fff;
     }
 
-    .day-col-empty,
-    .day-cell.column-empty { background: #fcfdff; }
-    .day-cell.cell-empty { vertical-align: middle; }
+    .day-cell.cell-empty,
+    .day-cell.column-empty {
+      background: #fbfcfe;
+      color: #a0a8b5;
+    }
 
     .empty {
-      color: #a1a9b4;
-      text-align: center;
-      padding: clamp(8px, 2vw, 30px) 0;
-      font-size: .9em;
+      display: grid;
+      min-height: calc(var(--slot-min-height) - 12px);
+      place-items: center;
+      color: #a0a8b5;
+      font-size: .95em;
     }
 
     .course-card,
     .intensive-item {
-      border: 1px solid var(--line-soft);
       border-left: 4px solid var(--ue-color, var(--ue-neutral));
       border-radius: 0;
-      background: #fbfcfe;
+      background: #fff;
     }
 
     .course-card {
-      min-width: 0;
-      padding: clamp(5px, .9vw, 9px) clamp(5px, .9vw, 10px) clamp(4px, .8vw, 8px);
-      margin: 0 0 8px;
-      overflow: hidden;
-      overflow-wrap: anywhere;
-    }
-
-    .course-card:last-child { margin-bottom: 0; }
-
-    .course-grid {
-      display: grid;
-      grid-template-columns: repeat(var(--course-columns, 2), minmax(0, 1fr));
-      gap: clamp(4px, .7vw, 8px);
-      align-items: stretch;
-    }
-
-    .course-grid .course-card {
-      margin: 0;
-      height: 100%;
-    }
-
-    .full-day-span {
-      position: relative;
-      height: calc(var(--slot-min-height) * var(--span-count, 3));
-      padding: 0 !important;
-      vertical-align: top;
-    }
-
-    .full-day-grid {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      grid-template-columns: repeat(var(--course-columns, 2), minmax(0, 1fr));
-      gap: clamp(4px, .7vw, 8px);
-      align-items: stretch;
-      padding: clamp(4px, .75vw, 10px);
-      min-height: calc(var(--slot-min-height) * var(--span-count, 3));
-    }
-
-    .full-day-grid .course-card {
       display: flex;
       flex-direction: column;
-      height: 100%;
+      gap: clamp(1px, .35vw, 4px);
       min-height: 100%;
-      margin: 0;
+      padding: clamp(3px, .7vw, 9px);
+      border-top: 1px solid var(--line-soft);
+      border-right: 1px solid var(--line-soft);
+      border-bottom: 1px solid var(--line-soft);
+      overflow: hidden;
+      overflow-wrap: anywhere;
+      word-break: normal;
     }
+
+    .course-card + .course-card { margin-top: 5px; }
 
     .course-title {
       font-weight: 760;
-      margin-bottom: 4px;
-      line-height: 1.22;
-    }
-
-    .course-time {
-      margin-bottom: 4px;
-      color: var(--accent);
-      font-size: .9em;
-      font-weight: 750;
-      font-variant-numeric: tabular-nums;
+      line-height: 1.12;
     }
 
     .course-meta,
     .course-room,
     .course-comment {
+      display: grid;
+      gap: 1px;
       color: var(--muted);
-      font-size: .88em;
+      font-size: .9em;
+      line-height: 1.15;
     }
-
-    .course-meta span + span::before {
-      content: " · ";
-      color: #a1a9b4;
-    }
-
-    .course-room { margin-top: 3px; }
 
     .course-comment {
-      margin-top: 6px;
-      padding-top: 6px;
-      border-top: 1px solid var(--line-soft);
-      font-style: italic;
+      margin-top: auto;
+      color: #334155;
+      font-size: .86em;
     }
 
-    .intensives {
-      font-size: clamp(.56rem, .38rem + .75vw, .93rem);
+    .course-grid,
+    .full-day-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--course-columns, 1), minmax(0, 1fr));
+      gap: clamp(2px, .5vw, 7px);
+      width: 100%;
+      min-width: 0;
+      align-items: stretch;
     }
 
-    .intensives col.comment-col { width: 36%; }
-    .intensives col.ec-col { width: 64%; }
+    .full-day-span {
+      height: calc(var(--slot-min-height) * var(--span-count, 3));
+      padding: 0;
+      background: #fff;
+    }
+
+    .full-day-fill {
+      display: flex;
+      width: 100%;
+      min-height: calc(var(--slot-min-height) * var(--span-count, 3));
+      height: 100%;
+      padding: clamp(2px, .5vw, 7px);
+    }
+
+    .full-day-fill > .course-grid {
+      flex: 1 1 auto;
+      height: 100%;
+      min-height: 100%;
+    }
+
+    .full-day-fill .course-card {
+      height: 100%;
+      min-height: 100%;
+    }
+
+    .intensives-wrap { width: 100%; }
+
+    .intensives,
+    .special-table {
+      font-size: clamp(.55rem, .38rem + .72vw, .88rem);
+    }
+
+    .intensives col.comment-col,
+    .special-table col.comment-col { width: 36%; }
+
+    .intensives col.ec-col,
+    .special-table col.ec-col { width: 64%; }
 
     .intensives th,
-    .intensives td {
-      padding: clamp(5px, .9vw, 10px);
+    .intensives td,
+    .special-table th,
+    .special-table td {
+      padding: clamp(4px, .8vw, 10px);
       overflow-wrap: anywhere;
     }
 
-    .intensives tbody td { background: #fff; }
+    .intensives tbody td,
+    .special-table tbody td { background: #fff; }
 
     .comment-cell {
+      color: #334155;
       font-weight: 650;
-      color: #344252;
-      white-space: pre-line;
     }
 
     .intensive-list {
       display: grid;
-      gap: clamp(4px, .8vw, 10px);
+      gap: 6px;
     }
 
     .intensive-item {
-      padding: clamp(5px, .9vw, 8px) clamp(5px, .9vw, 10px);
-      line-height: 1.25;
+      padding: clamp(4px, .75vw, 8px);
+      border-top: 1px solid var(--line-soft);
+      border-right: 1px solid var(--line-soft);
+      border-bottom: 1px solid var(--line-soft);
+      line-height: 1.2;
     }
 
     .intensive-item strong { font-weight: 760; }
 
+    .notice {
+      margin: 0;
+      padding: 12px 14px;
+      border: 1px dashed var(--line);
+      background: #fbfcfe;
+      color: var(--muted);
+      border-radius: 10px;
+    }
+
+    .notice.warning {
+      border-color: #f0d48f;
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
     .hours-panel {
       display: flex;
       flex-wrap: wrap;
-      align-items: center;
-      gap: 10px 16px;
-      margin: 0 0 14px;
-      padding: 12px 14px;
+      gap: 8px 18px;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 0 0 12px;
+      padding: 10px 12px;
       border: 1px solid var(--line-soft);
       background: #fbfcfe;
     }
 
+    .hours-panel p { margin: 0; }
+
     .hours-total {
-      margin: 0;
-      font-size: clamp(.72rem, .5rem + .65vw, .95rem);
+      font-size: clamp(.9rem, 1.7vw, 1.05rem);
     }
 
-    .hours-total strong { font-size: 1.15em; }
-
     .hours-note {
-      margin: 0;
       color: var(--muted);
-      font-size: clamp(.62rem, .48rem + .5vw, .84rem);
+      font-size: clamp(.58rem, .45rem + .75vw, .85rem);
     }
 
     .ec-table {
-      font-size: clamp(.52rem, .34rem + .62vw, .92rem);
+      font-size: clamp(.52rem, .35rem + .82vw, .9rem);
     }
 
-    .ec-table col.semester-col { width: 8%; }
-    .ec-table col.title-col { width: 32%; }
-    .ec-table col.code-col { width: 9%; }
-    .ec-table col.teacher-col { width: 37%; }
-    .ec-table col.hours-col { width: 7%; }
-    .ec-table col.count-col { width: 7%; }
+    .ec-table col.semester-col { width: 12%; }
+    .ec-table col.title-col { width: 29%; }
+    .ec-table col.code-col { width: 10%; }
+    .ec-table col.teacher-col { width: 35%; }
+    .ec-table col.hours-col { width: 8%; }
+    .ec-table col.count-col { width: 6%; }
 
     .ec-table th,
     .ec-table td {
-      padding: clamp(5px, .7vw, 10px);
+      padding: clamp(3px, .75vw, 9px);
       overflow-wrap: anywhere;
+      background: #fff;
     }
 
-    .ec-table tbody td { background: #fff; }
+    .ec-table th { background: var(--accent-soft); }
 
     .sort-button {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 6px;
+      gap: 4px;
       width: 100%;
-      margin: 0;
-      padding: 0;
       border: 0;
+      padding: 0;
       background: transparent;
       color: inherit;
       font: inherit;
-      font-weight: 800;
+      font-weight: 760;
       text-align: left;
       cursor: pointer;
     }
 
     .sort-mark {
+      margin-left: auto;
       color: var(--accent);
       font-size: .82em;
-      min-width: 1.1em;
-      text-align: right;
     }
-
-    .select-all-label {
-      display: inline-grid;
-      grid-template-rows: auto auto;
-      align-items: center;
-      justify-items: center;
-      gap: 4px;
-      width: 100%;
-      cursor: pointer;
-      user-select: none;
-      font-weight: 800;
-      color: #1e3d5f;
-      white-space: nowrap;
-      hyphens: none;
-    }
-
-    .check-cell,
-    .check-head { text-align: center; }
-
-    .ec-table input[type="checkbox"] {
-      width: 1.05em;
-      height: 1.05em;
-      margin: 0;
-      accent-color: var(--accent);
-      cursor: pointer;
-    }
-
-    .ec-title-cell { font-weight: 720; }
-    .teacher-cell { line-height: 1.24; }
 
     .teacher-list {
       display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 3px;
+      gap: 2px;
+      line-height: 1.18;
     }
 
     .teacher-name { display: block; }
 
-    .hours-cell {
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
+    .ec-title-cell { font-weight: 680; }
+
+    .hours-cell,
+    .check-cell,
+    .check-head { text-align: center; }
+
+    .select-all-label {
+      display: grid;
+      justify-items: center;
+      gap: 3px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .select-all-label input,
+    .ec-check {
+      width: clamp(10px, 2.6vw, 16px);
+      height: clamp(10px, 2.6vw, 16px);
+      margin: 0;
     }
 
     .muted { color: var(--muted); }
 
-    .notice {
-      margin: 0;
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: #fff;
-      color: var(--muted);
-    }
-
-    .notice.warning {
-      background: var(--warning-soft);
-      border-color: #ecd28e;
-      color: var(--warning);
-    }
-
     footer {
-      margin: 18px 4px 0;
+      margin-top: 18px;
       color: var(--muted);
       font-size: .86rem;
     }
@@ -588,125 +596,67 @@
     @media (max-width: 1000px) {
       .day-long { display: none; }
       .day-short { display: inline-block; }
-      .calendar {
-        --slot-min-height: clamp(72px, 9vw, 104px);
-        font-size: clamp(.5rem, .34rem + .64vw, .78rem);
-      }
+      .calendar { --calendar-font: clamp(.45rem, .26rem + 1vw, .72rem); }
     }
 
-    @media (max-width: 820px) {
-      .page {
-        width: calc(100% - 18px);
-        margin: 18px auto 38px;
-      }
-
+    @media (max-width: 720px) {
+      :root { --slot-min-height: clamp(86px, 19vw, 116px); }
+      .page { width: calc(100% - 12px); margin-top: 10px; margin-bottom: 28px; }
       header,
       .semester,
-      .data-section { padding: 16px; }
-
-      .controls,
-      .semester-actions,
-      .section-actions { justify-content: flex-start; }
-
+      .data-section { padding: 14px 10px; border-radius: 10px; }
       .button,
-      .file-button {
-        min-height: 34px;
-        padding: 0 10px;
-        font-size: .8rem;
-      }
-
-      .jump-menu a {
-        min-height: 30px;
-        padding: 0 10px;
-        font-size: .8rem;
-      }
-
-      .course-meta span { display: block; }
-      .course-meta span + span::before { content: ""; }
-      .course-room,
-      .course-comment { display: none; }
-      .intensives { font-size: clamp(.5rem, .3rem + .78vw, .74rem); }
-      .ec-table { font-size: clamp(.48rem, .3rem + .7vw, .72rem); }
+      .file-button { min-height: 32px; padding: 0 9px; font-size: .76rem; }
+      .button.small { min-height: 28px; padding: 0 7px; font-size: .68rem; }
+      .jump-menu a { min-height: 28px; padding: 0 9px; font-size: .75rem; }
+      .start-dates { padding: 9px 10px; font-size: clamp(.76rem, .55rem + .9vw, .9rem); }
+      .calendar { font-size: clamp(.42rem, .22rem + 1.18vw, .62rem); }
+      .calendar th,
+      .calendar td { border-width: 1px; }
+      .course-card,
+      .intensive-item { border-left-width: 3px; }
+      .ec-table { font-size: clamp(.44rem, .26rem + 1.2vw, .62rem); }
+      .intensives,
+      .special-table { font-size: clamp(.46rem, .28rem + 1vw, .66rem); }
     }
 
     @media (max-width: 600px) {
-      .page { width: calc(100% - 12px); }
-      .slot-full { display: none; }
-      .slot-short { display: inline; }
-      .calendar {
-        --slot-min-height: clamp(58px, 13vw, 78px);
-        font-size: clamp(.43rem, .26rem + .72vw, .62rem);
+      :root { --slot-min-height: clamp(92px, 25vw, 118px); }
+      .full-day-fill > .course-grid {
+        grid-template-columns: 1fr;
+        grid-auto-rows: minmax(0, 1fr);
       }
-      .calendar th,
-      .calendar td { padding: clamp(3px, .6vw, 6px); }
-      .course-grid { gap: 3px; }
-      .full-day-span {
-        height: auto;
-        min-height: calc(var(--slot-min-height) * var(--span-count, 3));
-      }
-      .full-day-grid {
-        position: static;
-        grid-template-columns: 1fr !important;
-        min-height: calc(var(--slot-min-height) * var(--span-count, 3));
-        padding: clamp(3px, .6vw, 6px);
-      }
-      .full-day-grid .course-card {
-        min-height: 52px;
-        height: auto;
-      }
-      .intensives { font-size: clamp(.46rem, .28rem + .72vw, .64rem); }
-      .ec-table { font-size: clamp(.45rem, .28rem + .68vw, .64rem); }
-      .ec-table col.semester-col { width: 9%; }
-      .ec-table col.title-col { width: 31%; }
-      .ec-table col.code-col { width: 9%; }
+      .full-day-fill .course-card + .course-card { margin-top: 0; }
+      .course-title { line-height: 1.05; }
+      .course-meta,
+      .course-room,
+      .course-comment { line-height: 1.08; }
+      .ec-table col.semester-col { width: 12%; }
+      .ec-table col.title-col { width: 28%; }
+      .ec-table col.code-col { width: 10%; }
       .ec-table col.teacher-col { width: 36%; }
-      .ec-table col.hours-col { width: 7%; }
-      .ec-table col.count-col { width: 8%; }
+      .ec-table col.hours-col { width: 8%; }
+      .ec-table col.count-col { width: 6%; }
     }
 
-    @media (max-width: 420px) {
+    @media (max-width: 430px) {
+      :root { --slot-min-height: 104px; }
       .page { width: calc(100% - 8px); }
       header,
       .semester,
-      .data-section { padding: 10px; }
-      .status { font-size: .78rem; }
-      .jump-menu { gap: 5px; }
-      .jump-menu a { font-size: .68rem; min-height: 26px; padding: 0 7px; }
-      .calendar {
-        --slot-min-height: 54px;
-        font-size: .43rem;
-      }
-      .intensives { font-size: .43rem; }
+      .data-section { padding-left: 7px; padding-right: 7px; }
+      .slot-long { display: none; }
+      .slot-short { display: inline; }
+      .calendar { font-size: .42rem; }
+      .calendar thead th,
+      .slot-cell,
+      .day-cell { padding: 2px; }
+      .course-card { padding: 2px; }
+      .intensives,
+      .special-table { font-size: .43rem; }
       .ec-table { font-size: .42rem; }
-      .button,
-      .file-button { font-size: .68rem; min-height: 30px; padding: 0 8px; }
-      .hours-panel { padding: 8px; }
-    }
-
-    @media print {
-      :root { --bg: #fff; --shadow: none; }
-      body { background: #fff; }
-      .page { width: 100%; margin: 0; }
-      header,
-      .semester,
-      .data-section {
-        border: 0;
-        box-shadow: none;
-        padding-left: 0;
-        padding-right: 0;
-      }
-      .controls,
-      .semester-actions,
-      .section-actions,
-      .jump-menu,
-      .no-export { display: none !important; }
-      .semester,
-      .data-section { page-break-inside: avoid; break-inside: avoid; }
-      .table-wrap { overflow: visible; }
-      th,
-      td { padding: 7px; }
-      .course-card,
-      .intensive-item { border-left-width: 3px; }
+      .ec-table th,
+      .ec-table td { padding: 2px; }
     }
   </style>
 </head>
@@ -715,18 +665,19 @@
     <header>
       <p class="eyebrow">M1 Création et expérience numériques</p>
       <h1>EDT <span style="color:tomato">CEN 1</span> - sem. 1 et 2</h1>
-      <nav class="jump-menu no-export" id="jumpMenu" aria-label="Navigation interne">
+      <div class="start-dates" id="startDates" hidden></div>
+      <nav class="jump-menu" aria-label="Navigation interne">
         <a href="#semester-1">Semestre 1</a>
         <a href="#semester-2">Semestre 2</a>
         <a href="#ec-directory">Liste des EC</a>
       </nav>
       <div class="status-row">
-        <p class="status" id="status">Chargement du tableau publié…</p>
-        <div class="controls" aria-label="Actions de chargement et d’export">
+        <p class="status" id="status">Initialisation…</p>
+        <div class="controls no-export">
           <button class="button" type="button" id="reloadButton">Recharger</button>
           <button class="button" type="button" id="exportPngButton" disabled>Exporter PNG</button>
           <button class="button" type="button" id="exportXlsButton" disabled>Exporter XLS</button>
-          <label class="file-button">Charger un CSV local<input type="file" id="csvFile" accept=".csv,text/csv"></label>
+          <label class="file-button">Charger CSV local<input type="file" id="csvFile" accept=".csv,text/csv"></label>
         </div>
       </div>
     </header>
@@ -734,33 +685,52 @@
     <main id="app" aria-live="polite"></main>
 
     <footer>
-      Source : <a id="sourceLink" href="#" target="_blank" rel="noopener">tableau CSV publié</a>. Les semaines intensives sont repérées par l’absence de jour ou d’horaire exploitable, ou par la présence du mot « intensif » dans le commentaire. Les valeurs « jours fériés » et « stage et suivi de mémoire » de la colonne <code>jour</code> sont présentées dans des tableaux dédiés. L’export XLS est produit au format Excel XML compatible avec Excel.
+      Source : <a id="sourceLink" href="#" target="_blank" rel="noopener">tableau CSV publié</a>. Les dates de rentrée sont affichées dans l’en-tête. Les semaines intensives, jours fériés et suivis de mémoire sont affichés dans des tableaux dédiés ; les semaines intensives et jours fériés sont triés chronologiquement à partir des dates lisibles dans les commentaires quand elles existent. L’export XLS est produit au format Excel XML compatible avec Excel.
     </footer>
   </div>
 
   <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS89o_F0m-rLMlplEY3gUxOhWcGKCOx0qWw9vBoiCrsFwCm2DGcAhn6vBX5w0nfhjU47yGsrlfvGeVI/pub?gid=1550105775&single=true&output=csv";
     const GVIZ_FALLBACK_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS89o_F0m-rLMlplEY3gUxOhWcGKCOx0qWw9vBoiCrsFwCm2DGcAhn6vBX5w0nfhjU47yGsrlfvGeVI/gviz/tq?gid=1550105775&headers=1&tqx=out:json;responseHandler:__m1CenGviz";
+    const HTML2CANVAS_URL = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
 
     const JOURS = ["lundi", "mardi", "mercredi", "jeudi", "vendredi"];
-    const JOUR_LABELS = { lundi: "Lundi", mardi: "Mardi", mercredi: "Merc.", jeudi: "Jeudi", vendredi: "Vendredi" };
+    const JOUR_LABELS = { lundi: "Lundi", mardi: "Mardi", mercredi: "Mercredi", jeudi: "Jeudi", vendredi: "Vendredi" };
     const JOUR_SHORT_LABELS = { lundi: "Lun.", mardi: "Mar.", mercredi: "Mer.", jeudi: "Jeu.", vendredi: "Ven." };
     const REQUIRED_COLUMNS = ["niveau", "semestre", "jour", "heure_debut", "heure_fin", "ec", "ue", "code", "enseignant", "salle", "nb_heures", "commentaire"];
     const UE_PALETTE = ["#2563eb", "#16a34a", "#dc2626", "#9333ea", "#ea580c", "#0891b2"];
     const STANDARD_SLOTS = [
-      { key: "540__720", label: "9h – 12h", startMinutes: 9 * 60, endMinutes: 12 * 60 },
-      { key: "720__900", label: "12h – 15h", startMinutes: 12 * 60, endMinutes: 15 * 60 },
-      { key: "900__1080", label: "15h – 18h", startMinutes: 15 * 60, endMinutes: 18 * 60 }
+      { key: "540__720", label: "9h – 12h", startLabel: "9h", endLabel: "12h", startMinutes: 9 * 60, endMinutes: 12 * 60 },
+      { key: "720__900", label: "12h – 15h", startLabel: "12h", endLabel: "15h", startMinutes: 12 * 60, endMinutes: 15 * 60 },
+      { key: "900__1080", label: "15h – 18h", startLabel: "15h", endLabel: "18h", startMinutes: 15 * 60, endMinutes: 18 * 60 }
     ];
-    const SPECIAL_DAY_DEFINITIONS = [
-      { key: "jours_feries", title: "Jours fériés", empty: "Aucun jour férié renseigné pour ce semestre." },
-      { key: "stage_memoire", title: "Stage et suivi de mémoire", empty: "Aucun stage ou suivi de mémoire renseigné pour ce semestre." }
+    const SPECIAL_DAY_TYPES = [
+      { key: "jours_feries", label: "Jours fériés", match: "jours feries", empty: "Aucun jour férié renseigné pour ce semestre." },
+      { key: "stage_memoire", label: "Stage et suivi de mémoire", match: "stage et suivi de memoire", empty: "Aucune ligne stage / suivi de mémoire renseignée pour ce semestre." }
     ];
+    const MONTH_INDEX = {
+      janvier: 1, janv: 1, jan: 1,
+      fevrier: 2, fevr: 2, fev: 2,
+      mars: 3,
+      avril: 4, avr: 4,
+      mai: 5,
+      juin: 6,
+      juillet: 7, juill: 7, juil: 7,
+      aout: 8,
+      septembre: 9, sept: 9, sep: 9,
+      octobre: 10, oct: 10,
+      novembre: 11, nov: 11,
+      decembre: 12, dec: 12
+    };
+    const MONTH_PATTERN = Object.keys(MONTH_INDEX)
+      .sort((a, b) => b.length - a.length)
+      .map(token => `${escapeRegExp(token)}\\.?`)
+      .join("|");
 
     const app = document.getElementById("app");
+    const startDates = document.getElementById("startDates");
     const statusEl = document.getElementById("status");
     const sourceLink = document.getElementById("sourceLink");
-    const jumpMenu = document.getElementById("jumpMenu");
     const reloadButton = document.getElementById("reloadButton");
     const exportPngButton = document.getElementById("exportPngButton");
     const exportXlsButton = document.getElementById("exportXlsButton");
@@ -774,7 +744,8 @@
       ueColors: new Map(),
       sortKey: "semestre",
       sortDir: "asc",
-      sourceLabel: ""
+      sourceLabel: "",
+      academicStartYear: currentAcademicStartYear()
     };
 
     sourceLink.href = CSV_URL;
@@ -825,6 +796,11 @@
       }
     });
 
+    let fullDayHeightSyncFrame = 0;
+    let fullDayHeightSyncTimeout = 0;
+    window.addEventListener("resize", scheduleFullDayHeightSync, { passive: true });
+    window.addEventListener("load", scheduleFullDayHeightSync, { passive: true });
+
     loadRemoteData();
 
     async function loadRemoteData() {
@@ -842,7 +818,7 @@
           const rows = await loadViaGviz();
           renderRows(rows, "API de visualisation Google");
         } catch (gvizError) {
-          showError("Aucune donnée n’a pu être chargée automatiquement. Utilisez le bouton « Charger un CSV local ».", gvizError);
+          showError("Aucune donnée n’a pu être chargée automatiquement. Utilisez le bouton « Charger CSV local ».", gvizError);
         }
       }
     }
@@ -888,11 +864,11 @@
     }
 
     function csvToRows(text) {
-      const table = parseCSV(String(text || "").replace(/^\uFEFF/, ""));
+      const table = parseCSV(text);
       if (!table.length) return [];
       const headers = table.shift().map(normalizeHeader);
       return table
-        .map(values => normalizeRow(Object.fromEntries(headers.map((header, index) => [header, values[index] ?? ""]))))
+        .map((values, index) => normalizeRow(Object.fromEntries(headers.map((header, columnIndex) => [header, values[columnIndex] ?? ""])), index))
         .filter(hasMeaningfulValue);
     }
 
@@ -903,14 +879,14 @@
       const headerHits = ["semestre", "jour", "ec"].filter(name => headers.includes(name)).length;
       if (headerHits < 2 && rawRows.length) headers = rawRows.shift().map(normalizeHeader);
       return rawRows
-        .map(values => normalizeRow(Object.fromEntries(headers.map((header, index) => [header, values[index] ?? ""]))))
+        .map((values, index) => normalizeRow(Object.fromEntries(headers.map((header, columnIndex) => [header, values[columnIndex] ?? ""])), index))
         .filter(hasMeaningfulValue);
     }
 
     function cellToString(cell) {
       if (!cell) return "";
       const value = cell.f ?? cell.v ?? "";
-      if (Array.isArray(value)) return value.join(":");
+      if (Array.isArray(value)) return value.length >= 5 ? `Date(${value.join(",")})` : value.join(":");
       return String(value);
     }
 
@@ -919,10 +895,11 @@
       let row = [];
       let cell = "";
       let inQuotes = false;
+      const input = String(text || "").replace(/^\uFEFF/, "");
 
-      for (let index = 0; index < text.length; index++) {
-        const char = text[index];
-        const next = text[index + 1];
+      for (let index = 0; index < input.length; index++) {
+        const char = input[index];
+        const next = input[index + 1];
 
         if (inQuotes) {
           if (char === '"' && next === '"') {
@@ -938,15 +915,15 @@
 
         if (char === '"') {
           inQuotes = true;
-        } else if (char === ',') {
+        } else if (char === ",") {
           row.push(cell);
           cell = "";
-        } else if (char === '\n') {
+        } else if (char === "\n") {
           row.push(cell);
           rows.push(row);
           row = [];
           cell = "";
-        } else if (char !== '\r') {
+        } else if (char !== "\r") {
           cell += char;
         }
       }
@@ -959,32 +936,47 @@
       return rows.filter(line => line.some(value => clean(value) !== ""));
     }
 
-    function normalizeRow(row) {
+    function normalizeRow(row, index = 0) {
       const normalized = {};
       for (const key of Object.keys(row || {})) normalized[normalizeHeader(key)] = clean(row[key]);
       for (const column of REQUIRED_COLUMNS) if (!(column in normalized)) normalized[column] = "";
+      normalized._sourceIndex = index;
       return normalized;
     }
 
     function normalizeHeader(value) {
       const key = stripAccents(value)
+        .trim()
         .toLowerCase()
         .replace(/^\uFEFF/, "")
-        .replace(/[^a-z0-9]+/g, "_")
-        .replace(/^_+|_+$/g, "");
+        .replace(/\s+/g, "_")
+        .replace(/[^a-z0-9_]/g, "_")
+        .replace(/_+/g, "_")
+        .replace(/^_|_$/g, "");
       const aliases = {
-        heure_debut: "heure_debut",
         heure_deb: "heure_debut",
         debut: "heure_debut",
-        heure_fin: "heure_fin",
         fin: "heure_fin",
-        nb_heures: "nb_heures",
-        nombre_heures: "nb_heures",
         heures: "nb_heures",
+        nombre_heures: "nb_heures",
         enseignant_e: "enseignant",
         enseignants: "enseignant"
       };
       return aliases[key] || key;
+    }
+
+    function clean(value) {
+      return String(value ?? "").replace(/\s+/g, " ").trim();
+    }
+
+    function stripAccents(value) {
+      return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function comparable(value) {
+      return stripAccents(value).trim().toLowerCase();
     }
 
     function hasMeaningfulValue(row) {
@@ -992,79 +984,105 @@
     }
 
     function renderRows(rows, sourceLabel) {
-      const normalizedRows = rows.map(normalizeRow).filter(hasMeaningfulValue);
+      const normalizedRows = rows.map((row, index) => normalizeRow(row, index)).filter(hasMeaningfulValue);
       if (!normalizedRows.length) {
         state.rows = [];
         state.ecRows = [];
         state.semesters = [];
         state.ueColors = new Map();
         state.selectedEcIds = new Set();
+        renderHeaderInfo([]);
         updateExportButtons(false);
         app.innerHTML = `<p class="notice warning">Le tableau est vide ou les colonnes attendues n’ont pas été trouvées.</p>`;
         setStatus("Aucune ligne exploitable trouvée.", "error");
-        updateJumpMenu([]);
         return;
       }
 
       state.rows = normalizedRows;
       state.sourceLabel = sourceLabel;
-      state.ueColors = buildUeColorMap(normalizedRows);
-      state.ecRows = buildEcRows(normalizedRows);
+      state.academicStartYear = inferAcademicStartYear(normalizedRows);
+      state.ueColors = buildUeColorMap(normalizedRows.filter(row => !headerDayType(row)));
+      renderHeaderInfo(normalizedRows);
+      state.ecRows = buildEcRows(normalizedRows.filter(row => !headerDayType(row) && !isExcludedFromEcDirectory(row)));
       state.selectedEcIds = new Set(state.ecRows.map(row => row.id));
-      state.semesters = Array.from(new Set(normalizedRows.map(row => clean(row.semestre) || "non_renseigne"))).sort(sortSemesterValues);
+      const semesterRows = normalizedRows.filter(row => !headerDayType(row));
+      state.semesters = Array.from(new Set(semesterRows.map(row => clean(row.semestre) || "non_renseigne"))).sort(sortSemesterValues);
 
       app.innerHTML = `
-        ${state.semesters.map((semester, index) => renderSemester(semester, normalizedRows.filter(row => (clean(row.semestre) || "non_renseigne") === semester), index)).join("")}
+        ${state.semesters.map((semester, index) => renderSemester(semester, semesterRows.filter(row => (clean(row.semestre) || "non_renseigne") === semester), index)).join("")}
         ${renderEcDirectory()}
       `;
 
-      updateJumpMenu(state.semesters);
       updateExportButtons(true);
       setLoadedStatus();
       syncSelectAllState();
+      scheduleFullDayHeightSync();
     }
 
-    function updateJumpMenu(semesters) {
-      const semesterLinks = semesters.length
-        ? semesters.map((semester, index) => `<a href="#semester-${index + 1}">${escapeHtml(formatSemester(semester))}</a>`)
-        : [`<a href="#semester-1">Semestre 1</a>`, `<a href="#semester-2">Semestre 2</a>`];
-      jumpMenu.innerHTML = `${semesterLinks.join("")}<a href="#ec-directory">Liste des EC</a>`;
+    function renderHeaderInfo(rows) {
+      if (!startDates) return;
+      const comments = Array.from(new Set(rows
+        .filter(row => headerDayType(row) === "date_rentree")
+        .map(row => clean(row.commentaire))
+        .filter(Boolean)))
+        .sort((a, b) => compareTextsByDateThenLabel(a, b));
+
+      if (!comments.length) {
+        startDates.hidden = true;
+        startDates.innerHTML = "";
+        return;
+      }
+
+      const title = comments.length > 1 ? "Dates de rentrée" : "Date de rentrée";
+      startDates.hidden = false;
+      startDates.innerHTML = `
+        <p class="start-dates-title">${escapeHtml(title)}</p>
+        <div class="start-dates-list">
+          ${comments.map(comment => `<div>${escapeHtml(comment)}</div>`).join("")}
+        </div>
+      `;
+    }
+
+    function compareTextsByDateThenLabel(a, b) {
+      const dateA = dateSortKeyForText(a);
+      const dateB = dateSortKeyForText(b);
+      const aHasDate = Number.isFinite(dateA);
+      const bHasDate = Number.isFinite(dateB);
+      if (aHasDate && bHasDate && dateA !== dateB) return dateA - dateB;
+      if (aHasDate !== bHasDate) return aHasDate ? -1 : 1;
+      return a.localeCompare(b, "fr", { numeric: true, sensitivity: "base" });
+    }
+
+    function headerDayType(row) {
+      const day = comparable(row.jour);
+      return day === "date de rentree" || day.includes("date de rentree") ? "date_rentree" : "";
+    }
+
+    function isExcludedFromEcDirectory(row) {
+      return specialDayType(row) === "jours_feries" || headerDayType(row) === "date_rentree";
+    }
+
+    function compareRowsByDateThenSource(a, b) {
+      const dateA = dateSortKeyForRow(a, a.semestre);
+      const dateB = dateSortKeyForRow(b, b.semestre);
+      const aHasDate = Number.isFinite(dateA);
+      const bHasDate = Number.isFinite(dateB);
+      if (aHasDate && bHasDate && dateA !== dateB) return dateA - dateB;
+      if (aHasDate !== bHasDate) return aHasDate ? -1 : 1;
+      const semesterDiff = sortSemesterValues(a.semestre, b.semestre);
+      if (semesterDiff) return semesterDiff;
+      const sourceDiff = (Number(a._sourceIndex) || 0) - (Number(b._sourceIndex) || 0);
+      return sourceDiff || clean(a.commentaire).localeCompare(clean(b.commentaire), "fr", { numeric: true, sensitivity: "base" });
     }
 
     function buildUeColorMap(rows) {
-      const uniqueUes = Array.from(new Set(rows.map(row => clean(row.ue)).filter(Boolean))).sort(sortUeLabels);
-      const map = new Map();
-      const used = new Set();
-
-      for (const ue of uniqueUes) {
-        const match = stripAccents(ue).match(/(?:^|\b)ue\s*([1-6])(?:\b|$)/i) || stripAccents(ue).match(/(?:^|\b)([1-6])(?:\b|$)/);
-        if (match) {
-          const index = Number(match[1]) - 1;
-          if (index >= 0 && index < UE_PALETTE.length) {
-            map.set(ue, UE_PALETTE[index]);
-            used.add(index);
-          }
-        }
-      }
-
-      let paletteIndex = 0;
-      for (const ue of uniqueUes) {
-        if (map.has(ue)) continue;
-        while (used.has(paletteIndex) && paletteIndex < UE_PALETTE.length) paletteIndex++;
-        const index = paletteIndex < UE_PALETTE.length ? paletteIndex : map.size % UE_PALETTE.length;
-        map.set(ue, UE_PALETTE[index]);
-        used.add(index);
-        paletteIndex++;
-      }
-      return map;
+      const labels = Array.from(new Set(rows.map(row => clean(row.ue)).filter(Boolean))).sort(sortUeLabels);
+      return new Map(labels.map((label, index) => [label, UE_PALETTE[index % UE_PALETTE.length]]));
     }
 
     function renderSemester(semester, rows, index) {
-      const weeklyRows = rows.filter(row => isWeeklyRow(row));
-      const intensiveRows = rows.filter(row => isIntensive(row));
-      const specialSections = SPECIAL_DAY_DEFINITIONS
-        .map(def => ({ ...def, rows: rows.filter(row => specialDayKey(row.jour) === def.key) }))
-        .filter(section => section.rows.length);
+      const weeklyRows = rows.filter(row => !specialDayType(row) && !headerDayType(row) && !isIntensive(row));
+      const intensiveRows = rows.filter(row => !headerDayType(row) && isIntensive(row));
       const id = `semester-${index + 1}`;
       const semesterTitle = formatSemester(semester);
       return `
@@ -1078,45 +1096,34 @@
           <div class="block-title">Calendrier hebdomadaire <span class="count">${weeklyRows.length} ligne(s)</span></div>
           ${renderWeeklyCalendar(weeklyRows)}
           <div class="block-title">Semaines intensives <span class="count">${intensiveRows.length} ligne(s)</span></div>
-          ${renderSpecialLikeTable(intensiveRows, "Aucune semaine intensive renseignée pour ce semestre.")}
-          ${specialSections.map(section => `
-            <div class="block-title">${escapeHtml(section.title)} <span class="count">${section.rows.length} ligne(s)</span></div>
-            ${renderSpecialLikeTable(section.rows, section.empty)}
-          `).join("")}
+          ${renderSimpleRows(intensiveRows, "Aucune semaine intensive renseignée pour ce semestre.", "intensives", semester, true)}
+          ${SPECIAL_DAY_TYPES.map(type => {
+            const specialRows = rows.filter(row => specialDayType(row) === type.key);
+            return `
+              <div class="block-title">${escapeHtml(type.label)} <span class="count">${specialRows.length} ligne(s)</span></div>
+              ${renderSimpleRows(specialRows, type.empty, "special-table", semester, type.key === "jours_feries")}
+            `;
+          }).join("")}
         </section>
       `;
     }
 
-    function isWeeklyRow(row) {
-      return !specialDayKey(row.jour) && !isIntensive(row) && JOURS.includes(normalizeDay(row.jour));
-    }
-
-    function isIntensive(row) {
-      if (specialDayKey(row.jour)) return false;
-      const day = normalizeDay(row.jour);
-      const hasValidWeekday = JOURS.includes(day);
-      const start = timeToMinutes(row.heure_debut);
-      const end = timeToMinutes(row.heure_fin);
-      const hasValidTime = Number.isFinite(start) && Number.isFinite(end) && end > start;
-      return !hasValidWeekday || !hasValidTime || /intensif/i.test(stripAccents(row.commentaire));
-    }
-
     function renderWeeklyCalendar(rows) {
-      const validRows = rows.filter(row => JOURS.includes(normalizeDay(row.jour)) && isValidTimeRange(row));
+      const validRows = rows.filter(row => JOURS.includes(normalizeDay(row.jour)) && Number.isFinite(timeToMinutes(row.heure_debut)) && Number.isFinite(timeToMinutes(row.heure_fin)));
       if (!validRows.length) return `<p class="notice">Aucun cours hebdomadaire renseigné pour ce semestre.</p>`;
 
       const slots = uniqueSlots(validRows);
-      const spanPlans = buildFullDaySpanPlans(validRows, slots);
-      const displaySlots = slots.filter(slot => !isSlotHiddenBySpan(slot, spanPlans));
       const buckets = new Map();
       for (const row of validRows) {
         const slot = slotFor(row);
-        if (isSlotHiddenBySpan(slot, spanPlans)) continue;
+        if (isFullDaySlot(slot)) continue;
         const key = `${slot.key}__${normalizeDay(row.jour)}`;
         if (!buckets.has(key)) buckets.set(key, []);
         buckets.get(key).push(row);
       }
 
+      const spanPlans = buildFullDaySpanPlans(validRows, slots);
+      const displaySlots = slots;
       const columnModel = buildCalendarColumnModel(validRows, displaySlots, buckets, spanPlans);
 
       return `
@@ -1128,7 +1135,7 @@
             </colgroup>
             <thead>
               <tr>
-                <th class="slot-head"><span class="slot-full">Créneau</span><span class="slot-short">H.</span></th>
+                <th class="slot-head"><span class="slot-long">Créneau</span><span class="slot-short">Crén.</span></th>
                 ${JOURS.map(day => `<th class="${columnModel.dayPresence[day] ? "" : "day-col-empty"}"><span class="day-label day-long">${JOUR_LABELS[day]}</span><span class="day-label day-short">${JOUR_SHORT_LABELS[day]}</span></th>`).join("")}
               </tr>
             </thead>
@@ -1145,18 +1152,12 @@
       `;
     }
 
-    function isValidTimeRange(row) {
-      const start = timeToMinutes(row.heure_debut);
-      const end = timeToMinutes(row.heure_fin);
-      return Number.isFinite(start) && Number.isFinite(end) && end > start;
-    }
-
     function renderSlotLabel(slot) {
       return `
         <span class="slot-label">
-          <span>${escapeHtml(slot.startLabel || timeLabel(slot.startMinutes))}</span>
+          <span>${escapeHtml(slot.startLabel || formatTimeFromMinutes(slot.startMinutes))}</span>
           <span class="slot-separator">–</span>
-          <span>${escapeHtml(slot.endLabel || timeLabel(slot.endMinutes))}</span>
+          <span>${escapeHtml(slot.endLabel || formatTimeFromMinutes(slot.endMinutes))}</span>
         </span>
       `;
     }
@@ -1166,7 +1167,7 @@
       if (plan && plan.skipKeys.has(slot.key)) return "";
       if (plan && plan.startKey === slot.key) {
         const columnEmpty = !columnModel.dayPresence[day];
-        return `<td class="day-cell full-day-span ${columnEmpty ? "column-empty" : ""}" rowspan="${plan.spanCount}" style="--span-count:${plan.spanCount};">${renderCourseCell(plan.rows, plan.slot, { fullDay: true, spanCount: plan.spanCount })}</td>`;
+        return `<td class="day-cell full-day-span ${columnEmpty ? "column-empty" : ""}" rowspan="${plan.spanCount}" data-span-count="${plan.spanCount}" style="--span-count: ${plan.spanCount}"><div class="full-day-fill">${renderCourseCell(plan.rows, plan.slot, { fullDaySpan: true })}</div></td>`;
       }
 
       const rowsForCell = buckets.get(`${slot.key}__${day}`) || [];
@@ -1174,111 +1175,21 @@
       return `<td class="day-cell ${columnEmpty ? "column-empty" : ""} ${rowsForCell.length ? "" : "cell-empty"}">${renderCourseCell(rowsForCell, slot)}</td>`;
     }
 
-    function buildFullDaySpanPlans(validRows, slots) {
-      const plans = {};
-      for (const day of JOURS) {
-        const fullRows = validRows.filter(row => normalizeDay(row.jour) === day && isFullDaySlot(slotFor(row)));
-        if (!fullRows.length) continue;
-        const fullSlot = mergeFullDaySlot(fullRows.map(slotFor));
-        const containedSlots = slots.filter(slot => isSlotContainedWithin(slot, fullSlot));
-        if (containedSlots.length >= 2) {
-          plans[day] = {
-            slot: fullSlot,
-            rows: fullRows.sort(sortFullDayCourses),
-            startKey: containedSlots[0].key,
-            spanCount: containedSlots.length,
-            skipKeys: new Set(containedSlots.slice(1).map(slot => slot.key)),
-            fullDayKeys: new Set(fullRows.map(row => slotFor(row).key))
-          };
-        }
-      }
-      return plans;
-    }
-
-    function mergeFullDaySlot(slots) {
-      const start = Math.min(...slots.map(slot => slot.startMinutes));
-      const end = Math.max(...slots.map(slot => slot.endMinutes));
-      return {
-        key: `${start}__${end}`,
-        label: `${timeLabel(start)} – ${timeLabel(end)}`,
-        startMinutes: start,
-        endMinutes: end,
-        startLabel: timeLabel(start),
-        endLabel: timeLabel(end)
-      };
-    }
-
-    function isSlotHiddenBySpan(slot, spanPlans) {
-      return Object.values(spanPlans).some(plan => plan.fullDayKeys.has(slot.key));
-    }
-
-    function isSlotContainedWithin(slot, containerSlot) {
-      return Number.isFinite(slot.startMinutes)
-        && Number.isFinite(slot.endMinutes)
-        && slot.startMinutes >= containerSlot.startMinutes
-        && slot.endMinutes <= containerSlot.endMinutes;
-    }
-
-    function buildCalendarColumnModel(validRows, slots, buckets, spanPlans = {}) {
-      const dayPresence = Object.fromEntries(JOURS.map(day => [day, validRows.some(row => normalizeDay(row.jour) === day)]));
-      const dayWeights = Object.fromEntries(JOURS.map(day => [day, dayPresence[day] ? 1 : 0]));
-
-      for (const day of JOURS) {
-        const plan = spanPlans[day];
-        if (plan && plan.rows.length > 1) dayWeights[day] = Math.max(dayWeights[day], Math.min(plan.rows.length, 4));
-      }
-
-      for (const slot of slots) {
-        for (const day of JOURS) {
-          const rows = buckets.get(`${slot.key}__${day}`) || [];
-          if (rows.length > 1 && shouldUseSubcolumns(rows, slot)) {
-            dayWeights[day] = Math.max(dayWeights[day], Math.min(rows.length, 4));
-          }
-        }
-      }
-
-      const slotWidth = 10;
-      const emptyWidth = 5;
-      const emptyCount = JOURS.filter(day => !dayPresence[day]).length;
-      const filledWeightTotal = JOURS.reduce((total, day) => total + dayWeights[day], 0);
-      const available = Math.max(45, 100 - slotWidth - emptyCount * emptyWidth);
-      const unit = filledWeightTotal ? available / filledWeightTotal : 0;
-      const dayWidths = {};
-      for (const day of JOURS) dayWidths[day] = dayPresence[day] ? round(unit * dayWeights[day], 2) : emptyWidth;
-      return { slotWidth, dayPresence, dayWidths };
-    }
-
     function renderCourseCell(rows, slot, options = {}) {
       if (!rows.length) return `<div class="empty">—</div>`;
-      const sorted = rows.slice().sort(options.fullDay ? sortFullDayCourses : sortCourses);
-      const columns = Math.min(sorted.length, 4);
-      if (options.fullDay) {
-        return `<div class="course-grid full-day-grid" style="--course-columns:${columns}; --span-count:${options.spanCount || 3};">${sorted.map(row => renderCourseCard(row, slot)).join("")}</div>`;
+      const sorted = rows.slice().sort(sortCourses);
+      if (options.fullDaySpan || shouldUseSubcolumns(sorted, slot)) {
+        return `<div class="course-grid full-day-grid" style="--course-columns: ${Math.min(sorted.length, 4)}">${sorted.map(renderCourseCard).join("")}</div>`;
       }
-      if (shouldUseSubcolumns(sorted, slot)) {
-        return `<div class="course-grid" style="--course-columns:${columns};">${sorted.map(row => renderCourseCard(row, slot)).join("")}</div>`;
-      }
-      return sorted.map(row => renderCourseCard(row, slot)).join("");
+      return sorted.map(renderCourseCard).join("");
     }
 
-    function shouldUseSubcolumns(rows, slot) {
-      return rows.length > 1 && isFullDaySlot(slot);
-    }
-
-    function isFullDaySlot(slot) {
-      if (!Number.isFinite(slot.startMinutes) || !Number.isFinite(slot.endMinutes)) return false;
-      return slot.startMinutes <= 9 * 60 && slot.endMinutes >= 18 * 60;
-    }
-
-    function renderCourseCard(row, slot) {
+    function renderCourseCard(row) {
       const metaParts = [row.code, row.enseignant].filter(Boolean);
       const roomParts = [row.salle ? `Salle : ${row.salle}` : "", row.nb_heures ? `${row.nb_heures} h` : ""].filter(Boolean);
-      const ueColor = colorForUe(row.ue);
-      const time = slot ? `${timeLabel(slot.startMinutes)} – ${timeLabel(slot.endMinutes)}` : "";
       return `
-        <article class="course-card" style="--ue-color: ${ueColor}">
+        <article class="course-card" style="--ue-color: ${colorForUe(row.ue)}">
           <div class="course-title">${escapeHtml(row.ec || "EC non renseigné")}</div>
-          ${time ? `<div class="course-time">${escapeHtml(time)}</div>` : ""}
           ${metaParts.length ? `<div class="course-meta">${metaParts.map(part => `<span>${escapeHtml(part)}</span>`).join("")}</div>` : ""}
           ${roomParts.length ? `<div class="course-room">${escapeHtml(roomParts.join(" · "))}</div>` : ""}
           ${row.commentaire ? `<div class="course-comment">${escapeHtml(row.commentaire)}</div>` : ""}
@@ -1286,12 +1197,13 @@
       `;
     }
 
-    function renderSpecialLikeTable(rows, emptyMessage) {
+    function renderSimpleRows(rows, emptyMessage, tableClass, semester, sortByDate = false) {
       if (!rows.length) return `<p class="notice">${escapeHtml(emptyMessage)}</p>`;
-      const groups = groupByComment(rows);
+      const groups = groupRowsByComment(rows, semester, sortByDate);
+
       return `
         <div class="table-wrap intensives-wrap">
-          <table class="intensives">
+          <table class="${tableClass}">
             <colgroup>
               <col class="comment-col">
               <col class="ec-col">
@@ -1303,12 +1215,12 @@
               </tr>
             </thead>
             <tbody>
-              ${groups.map(([comment, groupRows]) => `
+              ${groups.map(group => `
                 <tr>
-                  <td class="comment-cell">${escapeHtml(comment)}</td>
+                  <td class="comment-cell">${escapeHtml(group.comment)}</td>
                   <td>
                     <div class="intensive-list">
-                      ${groupRows.sort(sortCourses).map(renderIntensiveItem).join("")}
+                      ${group.rows.slice().sort(sortCourses).map(renderIntensiveItem).join("")}
                     </div>
                   </td>
                 </tr>
@@ -1319,19 +1231,33 @@
       `;
     }
 
-    function groupByComment(rows) {
-      const groups = new Map();
-      for (const row of rows) {
-        const comment = row.commentaire || "Sans commentaire";
-        if (!groups.has(comment)) groups.set(comment, []);
-        groups.get(comment).push(row);
-      }
-      return Array.from(groups.entries()).sort((a, b) => periodRankFromText(a[0]) - periodRankFromText(b[0]) || compareText(a[0], b[0]));
-    }
-
     function renderIntensiveItem(row) {
       const parts = [row.ec ? `<strong>${escapeHtml(row.ec)}</strong>` : "", row.code ? escapeHtml(row.code) : "", row.enseignant ? escapeHtml(row.enseignant) : ""].filter(Boolean);
-      return `<div class="intensive-item" style="--ue-color: ${colorForUe(row.ue)}">${parts.join("<br>") || "—"}</div>`;
+      return `<div class="intensive-item" style="--ue-color: ${colorForUe(row.ue)}">${parts.join("<br>") || "EC non renseigné"}</div>`;
+    }
+
+    function groupRowsByComment(rows, semester, sortByDate) {
+      const groups = new Map();
+      for (const row of rows) {
+        const comment = clean(row.commentaire) || "Sans commentaire";
+        if (!groups.has(comment)) groups.set(comment, { comment, rows: [], sourceIndex: Number.POSITIVE_INFINITY, dateKey: Number.POSITIVE_INFINITY, periodKey: periodRank(comment) });
+        const group = groups.get(comment);
+        group.rows.push(row);
+        group.sourceIndex = Math.min(group.sourceIndex, Number(row._sourceIndex) || 0);
+        group.dateKey = Math.min(group.dateKey, dateSortKeyForRow(row, semester));
+        group.periodKey = Math.min(group.periodKey, periodRank([comment, row.ec, row.code].join(" ")));
+      }
+
+      return Array.from(groups.values()).sort((a, b) => {
+        if (sortByDate) {
+          const aHasDate = Number.isFinite(a.dateKey);
+          const bHasDate = Number.isFinite(b.dateKey);
+          if (aHasDate && bHasDate && a.dateKey !== b.dateKey) return a.dateKey - b.dateKey;
+          if (aHasDate !== bHasDate) return aHasDate ? -1 : 1;
+        }
+        if (a.periodKey !== b.periodKey) return a.periodKey - b.periodKey;
+        return a.comment.localeCompare(b.comment, "fr", { numeric: true, sensitivity: "base" }) || a.sourceIndex - b.sourceIndex;
+      });
     }
 
     function buildEcRows(rows) {
@@ -1339,8 +1265,6 @@
       const seenSignatures = new Set();
 
       for (const row of rows) {
-        if (specialDayKey(row.jour) === "jours_feries") continue;
-        if (![row.ec, row.code, row.enseignant, row.nb_heures, row.heure_debut, row.heure_fin].some(value => clean(value) !== "")) continue;
         const key = [clean(row.semestre) || "non_renseigne", clean(row.ec), clean(row.code)].join("\u0001");
         if (!groups.has(key)) {
           groups.set(key, {
@@ -1369,14 +1293,14 @@
         semestre: group.semestre,
         ec: group.ec,
         code: group.code,
-        enseignants: Array.from(group.teachers).sort((a, b) => compareText(a, b)),
+        enseignants: Array.from(group.teachers).sort((a, b) => a.localeCompare(b, "fr", { sensitivity: "base" })),
         nb_heures: group.hours,
         sourceRows: group.sourceRows
       }));
     }
 
     function renderEcDirectory() {
-      const rows = sortedEcRows();
+      const rows = getSortedEcRows();
       const selectedTotal = selectedHoursTotal();
       const checkedCount = rows.filter(row => state.selectedEcIds.has(row.id)).length;
       const totalCount = rows.length;
@@ -1385,14 +1309,14 @@
           <div class="section-heading">
             <div>
               <h2>Liste des EC</h2>
-              <p>Version HTML du CSV : EC, code, enseignant(s) et volume horaire. Les lignes « jours fériés » sont exclues. Cliquez sur un en-tête pour trier.</p>
+              <p>Version HTML du CSV : EC, code, enseignant(s) et volume horaire, hors lignes « jours fériés » et « date de rentrée ». Cliquez sur un en-tête pour trier.</p>
             </div>
             <div class="section-actions no-export">
               <button class="button small" type="button" data-export-png="ec-directory" data-export-name="m1-cen-liste-ec.png">Exporter la liste en PNG</button>
             </div>
           </div>
           <div class="hours-panel" id="hoursPanel">
-            <p class="hours-total"><strong>${formatHours(selectedTotal)}</strong> heure(s) comptée(s)</p>
+            <p class="hours-total"><strong>${formatHours(selectedTotal)}</strong> vh compté(s)</p>
             <p class="hours-note">${checkedCount} EC sélectionné(s) sur ${totalCount}. Le total utilise <code>nb_heures</code> ; si la cellule est vide, il utilise la durée <code>heure_debut</code> → <code>heure_fin</code>.</p>
           </div>
           <div class="table-wrap ec-table-wrap">
@@ -1407,7 +1331,7 @@
               </colgroup>
               <thead>
                 <tr>
-                  ${renderSortableHeader("semestre", "sem")}
+                  ${renderSortableHeader("semestre", "Semestre")}
                   ${renderSortableHeader("ec", "EC")}
                   ${renderSortableHeader("code", "Code")}
                   ${renderSortableHeader("enseignants", "Enseignant(s)")}
@@ -1415,7 +1339,7 @@
                   <th class="check-head">
                     <label class="select-all-label" title="Tout cocher / tout décocher">
                       <span>#</span>
-                      <input type="checkbox" id="selectAllEc" aria-label="Tout cocher ou tout décocher pour le comptage des heures">
+                      <input type="checkbox" id="selectAllEc" aria-label="Tout cocher ou tout décocher pour le calcul du volume horaire">
                     </label>
                   </th>
                 </tr>
@@ -1436,114 +1360,307 @@
     }
 
     function renderEcRow(row) {
+      const teacherMarkup = row.enseignants.length
+        ? `<div class="teacher-list">${row.enseignants.map(name => `<span class="teacher-name">${escapeHtml(name)}</span>`).join("")}</div>`
+        : `<span class="muted">—</span>`;
       const checked = state.selectedEcIds.has(row.id) ? "checked" : "";
       return `
         <tr>
           <td>${escapeHtml(formatSemester(row.semestre))}</td>
           <td class="ec-title-cell">${escapeHtml(row.ec)}</td>
-          <td>${escapeHtml(row.code)}</td>
-          <td class="teacher-cell">${renderTeacherList(row.enseignants)}</td>
-          <td class="hours-cell">${escapeHtml(formatHours(row.nb_heures))}</td>
-          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="${attributeSafe(row.id)}" ${checked} aria-label="Compter ${escapeHtml(row.ec)}"></td>
+          <td>${row.code ? escapeHtml(row.code) : `<span class="muted">—</span>`}</td>
+          <td class="teacher-cell">${teacherMarkup}</td>
+          <td class="hours-cell">${formatHours(row.nb_heures)}</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="${escapeHtml(row.id)}" aria-label="Compter ${escapeHtml(row.ec)}" ${checked}></td>
         </tr>
       `;
     }
 
-    function renderTeacherList(teachers) {
-      if (!teachers || !teachers.length) return `<span class="muted">—</span>`;
-      return `<span class="teacher-list">${teachers.map(name => `<span class="teacher-name">${escapeHtml(name)}</span>`).join("")}</span>`;
+    function getSortedEcRows() {
+      const rows = state.ecRows.slice();
+      const dir = state.sortDir === "desc" ? -1 : 1;
+      rows.sort((a, b) => compareEcRows(a, b, state.sortKey) * dir || compareEcRows(a, b, "ec"));
+      return rows;
+    }
+
+    function compareEcRows(a, b, key) {
+      if (key === "nb_heures") return (a.nb_heures - b.nb_heures) || a.ec.localeCompare(b.ec, "fr", { numeric: true, sensitivity: "base" });
+      if (key === "enseignants") return a.enseignants.join(" ").localeCompare(b.enseignants.join(" "), "fr", { numeric: true, sensitivity: "base" });
+      if (key === "semestre") return sortSemesterValues(a.semestre, b.semestre) || a.ec.localeCompare(b.ec, "fr", { numeric: true, sensitivity: "base" });
+      return String(a[key] || "").localeCompare(String(b[key] || ""), "fr", { numeric: true, sensitivity: "base" });
     }
 
     function updateSort(key) {
+      if (!["semestre", "ec", "code", "enseignants", "nb_heures"].includes(key)) return;
       if (state.sortKey === key) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
       else {
         state.sortKey = key;
         state.sortDir = "asc";
       }
-      const section = document.getElementById("ec-directory");
-      if (section) {
-        section.outerHTML = renderEcDirectory();
+      const directory = document.getElementById("ec-directory");
+      if (directory) {
+        directory.outerHTML = renderEcDirectory();
         syncSelectAllState();
       }
     }
 
-    function sortedEcRows() {
-      const rows = [...state.ecRows];
-      rows.sort((a, b) => {
-        const primary = compareEcByKey(a, b, state.sortKey);
-        const fallback = primary || compareEcByKey(a, b, "semestre") || compareEcByKey(a, b, "ec") || compareEcByKey(a, b, "code") || compareEcByKey(a, b, "enseignants");
-        return state.sortDir === "asc" ? fallback : -fallback;
-      });
-      return rows;
-    }
-
-    function compareEcByKey(a, b, key) {
-      if (key === "semestre") return semesterRank(a.semestre) - semesterRank(b.semestre) || compareText(a.semestre, b.semestre);
-      if (key === "nb_heures") return (a.nb_heures - b.nb_heures) || compareText(a.ec, b.ec);
-      if (key === "enseignants") return compareText((a.enseignants || []).join(" "), (b.enseignants || []).join(" "));
-      return compareText(a[key], b[key]);
-    }
-
     function toggleAllEcRows(checked) {
-      if (checked) state.selectedEcIds = new Set(state.ecRows.map(row => row.id));
-      else state.selectedEcIds = new Set();
+      if (checked) state.ecRows.forEach(row => state.selectedEcIds.add(row.id));
+      else state.selectedEcIds.clear();
       document.querySelectorAll(".ec-check").forEach(input => { input.checked = checked; });
       updateHoursPanel();
       syncSelectAllState();
     }
 
+    function syncSelectAllState() {
+      const selectAll = document.getElementById("selectAllEc");
+      if (!selectAll) return;
+      const total = state.ecRows.length;
+      const checked = state.ecRows.filter(row => state.selectedEcIds.has(row.id)).length;
+      selectAll.checked = total > 0 && checked === total;
+      selectAll.indeterminate = checked > 0 && checked < total;
+    }
+
     function updateHoursPanel() {
       const panel = document.getElementById("hoursPanel");
       if (!panel) return;
-      const total = selectedHoursTotal();
       const checkedCount = state.ecRows.filter(row => state.selectedEcIds.has(row.id)).length;
       panel.innerHTML = `
-        <p class="hours-total"><strong>${formatHours(total)}</strong> heure(s) comptée(s)</p>
+        <p class="hours-total"><strong>${formatHours(selectedHoursTotal())}</strong> vh compté(s)</p>
         <p class="hours-note">${checkedCount} EC sélectionné(s) sur ${state.ecRows.length}. Le total utilise <code>nb_heures</code> ; si la cellule est vide, il utilise la durée <code>heure_debut</code> → <code>heure_fin</code>.</p>
       `;
     }
 
     function selectedHoursTotal() {
-      return state.ecRows.filter(row => state.selectedEcIds.has(row.id)).reduce((sum, row) => sum + row.nb_heures, 0);
+      return state.ecRows.reduce((total, row) => total + (state.selectedEcIds.has(row.id) ? row.nb_heures : 0), 0);
     }
 
-    function syncSelectAllState() {
-      const checkbox = document.getElementById("selectAllEc");
-      if (!checkbox) return;
-      const checkedCount = state.ecRows.filter(row => state.selectedEcIds.has(row.id)).length;
-      checkbox.checked = checkedCount === state.ecRows.length && state.ecRows.length > 0;
-      checkbox.indeterminate = checkedCount > 0 && checkedCount < state.ecRows.length;
+    function isIntensive(row) {
+      if (specialDayType(row) || headerDayType(row)) return false;
+      const dayIsValid = JOURS.includes(normalizeDay(row.jour));
+      const hasTime = Number.isFinite(timeToMinutes(row.heure_debut)) && Number.isFinite(timeToMinutes(row.heure_fin));
+      const comment = comparable(row.commentaire);
+      const day = comparable(row.jour);
+      return !dayIsValid || !hasTime || /intensif|intensive|intensifs|intensives/.test(comment) || /intensif|intensive|intensifs|intensives/.test(day);
+    }
+
+    function specialDayType(row) {
+      const day = comparable(row.jour);
+      for (const type of SPECIAL_DAY_TYPES) if (day === type.match || day.includes(type.match)) return type.key;
+      return "";
     }
 
     function uniqueSlots(rows) {
-      const map = new Map(STANDARD_SLOTS.map(slot => [slot.key, { ...slot, startLabel: timeLabel(slot.startMinutes), endLabel: timeLabel(slot.endMinutes) }]));
+      const byKey = new Map(STANDARD_SLOTS.map(slot => [slot.key, { ...slot }]));
       for (const row of rows) {
         const slot = slotFor(row);
-        if (!Number.isFinite(slot.startMinutes) || !Number.isFinite(slot.endMinutes) || slot.endMinutes <= slot.startMinutes) continue;
-        if (isFullDaySlot(slot)) {
-          const standardContained = STANDARD_SLOTS.filter(standard => isSlotContainedWithin(standard, slot));
-          if (standardContained.length >= 2) continue;
-        }
-        if (!map.has(slot.key)) map.set(slot.key, slot);
+        const representedByStandardRows = isFullDaySlot(slot) && fullDayDisplaySlots(slot, STANDARD_SLOTS).length >= 2;
+        if (!representedByStandardRows && !byKey.has(slot.key)) byKey.set(slot.key, slot);
       }
-      return Array.from(map.values()).sort((a, b) => (a.startMinutes - b.startMinutes) || (a.endMinutes - b.endMinutes));
+      return Array.from(byKey.values()).sort((a, b) => {
+        const startDiff = a.startMinutes - b.startMinutes;
+        if (startDiff) return startDiff;
+        const durationDiff = durationMinutes(a) - durationMinutes(b);
+        if (durationDiff) return durationDiff;
+        const endDiff = a.endMinutes - b.endMinutes;
+        if (endDiff) return endDiff;
+        return a.label.localeCompare(b.label, "fr", { numeric: true, sensitivity: "base" });
+      });
     }
 
     function slotFor(row) {
-      const start = timeToMinutes(row.heure_debut);
-      const end = timeToMinutes(row.heure_fin);
+      const start = clean(row.heure_debut);
+      const end = clean(row.heure_fin);
+      const startMinutes = timeToMinutes(start);
+      const endMinutes = timeToMinutes(end);
+      const startLabel = formatTime(start);
+      const endLabel = formatTime(end);
+      const label = `${startLabel} – ${endLabel}`;
       return {
-        key: `${start}__${end}`,
-        label: `${timeLabel(start)} – ${timeLabel(end)}`,
-        startMinutes: start,
-        endMinutes: end,
-        startLabel: timeLabel(start),
-        endLabel: timeLabel(end)
+        key: `${Number.isFinite(startMinutes) ? startMinutes : start}__${Number.isFinite(endMinutes) ? endMinutes : end}`,
+        label,
+        startLabel,
+        endLabel,
+        startMinutes: Number.isFinite(startMinutes) ? startMinutes : 99999,
+        endMinutes: Number.isFinite(endMinutes) ? endMinutes : 99999
       };
     }
 
+    function durationMinutes(slot) {
+      if (!Number.isFinite(slot.startMinutes) || !Number.isFinite(slot.endMinutes)) return 99999;
+      return Math.max(0, slot.endMinutes - slot.startMinutes);
+    }
+
+    function isFullDaySlot(slot) {
+      if (!Number.isFinite(slot.startMinutes) || !Number.isFinite(slot.endMinutes)) return false;
+      return slot.startMinutes <= 9 * 60 && slot.endMinutes >= 18 * 60;
+    }
+
+    function fullDayDisplaySlots(fullSlot, slots) {
+      return slots.filter(slot => {
+        if (isFullDaySlot(slot)) return false;
+        return Number.isFinite(slot.startMinutes) && Number.isFinite(slot.endMinutes) && slot.startMinutes >= fullSlot.startMinutes && slot.endMinutes <= fullSlot.endMinutes;
+      }).sort((a, b) => a.startMinutes - b.startMinutes || a.endMinutes - b.endMinutes);
+    }
+
+    function buildFullDaySpanPlans(validRows, slots) {
+      const plans = {};
+      for (const day of JOURS) {
+        const groups = new Map();
+        for (const row of validRows.filter(item => normalizeDay(item.jour) === day)) {
+          const fullSlot = slotFor(row);
+          if (!isFullDaySlot(fullSlot)) continue;
+          if (!groups.has(fullSlot.key)) groups.set(fullSlot.key, { slot: fullSlot, rows: [] });
+          groups.get(fullSlot.key).rows.push(row);
+        }
+
+        for (const group of groups.values()) {
+          const containedSlots = fullDayDisplaySlots(group.slot, slots);
+          if (containedSlots.length >= 2) {
+            plans[day] = {
+              slot: group.slot,
+              rows: group.rows.slice().sort(sortCourses),
+              startKey: containedSlots[0].key,
+              spanCount: containedSlots.length,
+              skipKeys: new Set(containedSlots.slice(1).map(slot => slot.key))
+            };
+            break;
+          }
+        }
+      }
+      return plans;
+    }
+
+    function isSlotHiddenBySpan(slot, spanPlans) {
+      return Object.values(spanPlans).some(plan => plan.skipKeys.has(slot.key));
+    }
+
+    function buildCalendarColumnModel(validRows, slots, buckets, spanPlans) {
+      const dayPresence = Object.fromEntries(JOURS.map(day => [day, false]));
+      const dayWeights = Object.fromEntries(JOURS.map(day => [day, 1]));
+
+      for (const day of JOURS) {
+        const rowsForDay = validRows.filter(row => normalizeDay(row.jour) === day);
+        dayPresence[day] = rowsForDay.length > 0;
+        const fullPlan = spanPlans[day];
+        if (fullPlan && fullPlan.rows.length > 1) dayWeights[day] = Math.max(dayWeights[day], Math.min(fullPlan.rows.length, 4));
+      }
+
+      for (const slot of slots) {
+        for (const day of JOURS) {
+          const rows = buckets.get(`${slot.key}__${day}`) || [];
+          if (rows.length > 1 && shouldUseSubcolumns(rows, slot)) dayWeights[day] = Math.max(dayWeights[day], Math.min(rows.length, 4));
+        }
+      }
+
+      const slotWidth = 11;
+      const emptyWidth = 8;
+      const emptyCount = JOURS.filter(day => !dayPresence[day]).length;
+      const filledWeightTotal = JOURS.reduce((total, day) => total + (dayPresence[day] ? dayWeights[day] : 0), 0);
+      const available = Math.max(40, 100 - slotWidth - emptyCount * emptyWidth);
+      const unit = filledWeightTotal ? available / filledWeightTotal : 0;
+      const dayWidths = {};
+      for (const day of JOURS) dayWidths[day] = dayPresence[day] ? round(unit * dayWeights[day], 2) : emptyWidth;
+      return { slotWidth, dayPresence, dayWidths };
+    }
+
+    function shouldUseSubcolumns(rows, slot) {
+      return rows.length > 1 && isFullDaySlot(slot);
+    }
+
+    function sortCourses(a, b) {
+      const periodDiff = periodRank([a.commentaire, a.ec].join(" ")) - periodRank([b.commentaire, b.ec].join(" "));
+      if (periodDiff) return periodDiff;
+      const priorityDiff = coursePriority(a) - coursePriority(b);
+      if (priorityDiff) return priorityDiff;
+      const dateA = dateSortKeyForRow(a, a.semestre);
+      const dateB = dateSortKeyForRow(b, b.semestre);
+      if (Number.isFinite(dateA) && Number.isFinite(dateB) && dateA !== dateB) return dateA - dateB;
+      if (Number.isFinite(dateA) !== Number.isFinite(dateB)) return Number.isFinite(dateA) ? -1 : 1;
+      const startDiff = timeToMinutes(a.heure_debut) - timeToMinutes(b.heure_debut);
+      if (Number.isFinite(startDiff) && startDiff) return startDiff;
+      const sourceDiff = (Number(a._sourceIndex) || 0) - (Number(b._sourceIndex) || 0);
+      return sourceDiff || clean(a.ec).localeCompare(clean(b.ec), "fr", { numeric: true, sensitivity: "base" });
+    }
+
+    function periodRank(value) {
+      const text = comparable(value);
+      if (/\b(1|une|premier|premiere|premieres|premiers)\b/.test(text) || /3\s+premieres/.test(text) || /5\s+premieres/.test(text)) return 10;
+      if (/\b(suivant|suivante|suivants|suivantes)\b/.test(text)) return 20;
+      if (/\b(dernier|derniere|derniers|dernieres)\b/.test(text)) return 30;
+      return 100;
+    }
+
+    function coursePriority(row) {
+      const ec = comparable(row.ec);
+      if (ec.includes("programmation creative")) return -10;
+      return 0;
+    }
+
+    function normalizeDay(day) {
+      const value = comparable(day);
+      if (value.startsWith("lun")) return "lundi";
+      if (value.startsWith("mar")) return "mardi";
+      if (value.startsWith("mer")) return "mercredi";
+      if (value.startsWith("jeu")) return "jeudi";
+      if (value.startsWith("ven")) return "vendredi";
+      return value;
+    }
+
+    function timeToMinutes(value) {
+      const raw = clean(value).toLowerCase();
+      if (!raw) return Number.NaN;
+
+      const dateMatch = raw.match(/date\([^)]*,\s*(\d{1,2})\s*,\s*(\d{1,2})\s*,\s*(\d{1,2})\s*\)/i);
+      if (dateMatch) return checkedTime(Number(dateMatch[1]), Number(dateMatch[2]));
+
+      const compact = raw
+        .replace(/[–—-]/g, "-")
+        .replace(/\s+/g, "")
+        .replace(/h(?=\d)/g, ":")
+        .replace(/h$/g, ":00");
+
+      let match = compact.match(/^(\d{1,2}):(\d{1,2})(?::\d{1,2})?$/);
+      if (match) return checkedTime(Number(match[1]), Number(match[2]));
+
+      match = compact.match(/^(\d{1,2})$/);
+      if (match) return checkedTime(Number(match[1]), 0);
+
+      match = compact.match(/^(\d{1,2})h(\d{0,2})$/);
+      if (match) return checkedTime(Number(match[1]), Number(match[2] || 0));
+
+      return Number.NaN;
+    }
+
+    function checkedTime(hours, minutes) {
+      if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return Number.NaN;
+      if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return Number.NaN;
+      return hours * 60 + minutes;
+    }
+
+    function formatTime(value) {
+      const minutes = timeToMinutes(value);
+      if (!Number.isFinite(minutes)) return clean(value);
+      return formatTimeFromMinutes(minutes);
+    }
+
+    function formatTimeFromMinutes(minutes) {
+      if (!Number.isFinite(minutes)) return "";
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return mins ? `${hours}h${String(mins).padStart(2, "0")}` : `${hours}h`;
+    }
+
+    function parseHours(value) {
+      const normalized = clean(value).replace(",", ".");
+      const match = normalized.match(/-?\d+(?:\.\d+)?/);
+      if (!match) return Number.NaN;
+      const number = Number(match[0]);
+      return Number.isFinite(number) && number >= 0 ? number : Number.NaN;
+    }
+
     function hoursForRow(row) {
-      const explicit = numericHours(row.nb_heures);
+      const explicit = parseHours(row.nb_heures);
       if (Number.isFinite(explicit)) return explicit;
       const start = timeToMinutes(row.heure_debut);
       const end = timeToMinutes(row.heure_fin);
@@ -1551,91 +1668,172 @@
       return 0;
     }
 
-    function numericHours(value) {
-      const text = clean(value).replace(",", ".");
-      const match = text.match(/\d+(?:\.\d+)?/);
-      return match ? Number(match[0]) : Number.NaN;
-    }
-
-    function timeToMinutes(value) {
-      let text = clean(value);
-      if (!text) return Number.NaN;
-
-      const dateMatch = text.match(/Date\([^,]+,[^,]+,[^,]+,\s*(\d{1,2})(?:,\s*(\d{1,2}))?/i);
-      if (dateMatch) return Number(dateMatch[1]) * 60 + Number(dateMatch[2] || 0);
-
-      const decimal = Number(text.replace(",", "."));
-      if (Number.isFinite(decimal) && decimal >= 0 && decimal < 1) return Math.round(decimal * 24 * 60);
-
-      text = stripAccents(text).toLowerCase();
-      const longTime = text.match(/(?:^|\D)(\d{1,2})[:h](\d{2})(?::\d{2})?(?:\D|$)/);
-      if (longTime) {
-        const hours = Number(longTime[1]);
-        const minutes = Number(longTime[2]);
-        if (hours <= 23 && minutes <= 59) return hours * 60 + minutes;
-      }
-
-      const hourOnly = text.match(/(?:^|\D)(\d{1,2})\s*h(?:\D|$)/) || text.match(/^(\d{1,2})$/);
-      if (hourOnly) {
-        const hours = Number(hourOnly[1]);
-        if (hours <= 23) return hours * 60;
-      }
-
-      return Number.NaN;
-    }
-
-    function timeLabel(minutes) {
-      if (!Number.isFinite(minutes)) return "—";
-      const hours = Math.floor(minutes / 60);
-      const mins = minutes % 60;
-      return mins ? `${hours}h${String(mins).padStart(2, "0")}` : `${hours}h`;
-    }
-
-    function normalizeDay(value) {
-      const text = stripAccents(value).toLowerCase().replace(/[^a-z]+/g, " ").trim();
-      for (const day of JOURS) if (text === day || text.includes(day)) return day;
-      return text.replace(/\s+/g, "_");
-    }
-
-    function specialDayKey(value) {
-      const text = stripAccents(value).toLowerCase().replace(/[^a-z]+/g, " ").trim();
-      if (!text) return "";
-      if (text.includes("jour") && text.includes("ferie")) return "jours_feries";
-      if (text.includes("stage") && text.includes("suivi") && text.includes("memoire")) return "stage_memoire";
-      return "";
+    function formatHours(value) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return "0";
+      const rounded = Math.round(number * 100) / 100;
+      return Number.isInteger(rounded) ? String(rounded) : String(rounded).replace(".", ",");
     }
 
     function splitPeople(value) {
       return clean(value)
-        .split(/\s*(?:;|,|\/|\bet\b|\+|&|\n)\s*/i)
+        .split(/(?:;|,|\s+et\s+|\s+&\s+)/i)
         .map(clean)
         .filter(Boolean);
     }
 
-    function sortFullDayCourses(a, b) {
-      return periodRank(a) - periodRank(b) || sortCourses(a, b);
+    function dateSortKeyForRow(row, semester) {
+      const text = [row.commentaire, row.ec, row.code, row.salle].filter(Boolean).join(" ");
+      return dateSortKeyForText(text, semester || row.semestre);
     }
 
-    function periodRank(row) {
-      return periodRankFromText([row.commentaire, row.ec, row.code].join(" "));
+    function dateSortKeyForText(text, semester = "") {
+      const keys = collectDateKeys(text, semester);
+      return keys.length ? Math.min(...keys) : Number.POSITIVE_INFINITY;
     }
 
-    function periodRankFromText(value) {
-      const text = stripAccents(value).toLowerCase();
-      if (/premier|premiere|premieres|premiers/.test(text)) return 1;
-      if (/suivant|suivante|suivantes/.test(text)) return 2;
-      if (/dernier|derniere|dernieres|derniers/.test(text)) return 3;
-      return 9;
+    function normalizeDateText(text) {
+      return comparable(text)
+        .replace(/1er/g, "1")
+        .replace(/[–—]/g, "-")
+        .replace(/\b(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b/g, " ")
+        .replace(/\b([a-z]+)\s*\.\s*/g, "$1 ")
+        .replace(/\ba\b/g, "au")
+        .replace(/\s+/g, " ")
+        .trim();
     }
 
-    function sortCourses(a, b) {
-      return periodRank(a) - periodRank(b) || compareText([a.ec, a.code, a.enseignant].join(" "), [b.ec, b.code, b.enseignant].join(" "));
+    function collectDateKeys(text, semester) {
+      const normalized = normalizeDateText(text);
+      const keys = [];
+      let match;
+
+      const rangeWithTwoMonths = new RegExp(`\\b(?:du|de|semaine du)?\\s*(\\d{1,2})\\s+(${MONTH_PATTERN})\\s*(?:au|-|/)\\s*(\\d{1,2})\\s+(${MONTH_PATTERN})(?:\\s*(?:de\\s+)?(\\d{4}|\\d{2}))?`, "g");
+      while ((match = rangeWithTwoMonths.exec(normalized))) {
+        pushDateKey(keys, Number(match[1]), monthNumber(match[2]), match[5], semester);
+      }
+
+      const rangeWithOneMonth = new RegExp(`\\b(?:du|de|semaine du)?\\s*(\\d{1,2})\\s*(?:au|-|/)\\s*(\\d{1,2})\\s+(${MONTH_PATTERN})(?:\\s*(?:de\\s+)?(\\d{4}|\\d{2}))?`, "g");
+      while ((match = rangeWithOneMonth.exec(normalized))) {
+        pushDateKey(keys, Number(match[1]), monthNumber(match[3]), match[4], semester);
+      }
+
+      const numericRange = /\b(?:du|de|semaine du)?\s*(\d{1,2})[.\/-](\d{1,2})(?:[.\/-](\d{4}|\d{2}))?\s*(?:au|-|\/)\s*(\d{1,2})[.\/-](\d{1,2})(?:[.\/-](\d{4}|\d{2}))?\b/g;
+      while ((match = numericRange.exec(normalized))) {
+        pushDateKey(keys, Number(match[1]), Number(match[2]), match[3] || match[6], semester);
+      }
+
+      const dayMonth = new RegExp(`\\b(\\d{1,2})\\s+(${MONTH_PATTERN})(?:\\s*(?:de\\s+)?(\\d{4}|\\d{2}))?`, "g");
+      while ((match = dayMonth.exec(normalized))) {
+        pushDateKey(keys, Number(match[1]), monthNumber(match[2]), match[3], semester);
+      }
+
+      const numeric = /\b(\d{1,2})[.\/-](\d{1,2})(?:[.\/-](\d{4}|\d{2}))?\b/g;
+      while ((match = numeric.exec(normalized))) {
+        pushDateKey(keys, Number(match[1]), Number(match[2]), match[3], semester);
+      }
+
+      if (/\btoussaint\b/.test(normalized)) pushDateKey(keys, 1, 11, "", semester);
+      if (/\barmistice\b/.test(normalized)) pushDateKey(keys, 11, 11, "", semester);
+      if (/\bnoel\b/.test(normalized)) pushDateKey(keys, 25, 12, "", semester);
+      if (/\bnouvel an\b|\bjour de l an\b/.test(normalized)) pushDateKey(keys, 1, 1, "", semester);
+      if (/\bfete du travail\b|\b1 mai\b/.test(normalized)) pushDateKey(keys, 1, 5, "", semester);
+      if (/\bvictoire\b|\b8 mai\b/.test(normalized)) pushDateKey(keys, 8, 5, "", semester);
+
+      const springHolidayYear = state.academicStartYear + 1;
+      const easter = easterSunday(springHolidayYear);
+      if (/\bascension\b/.test(normalized)) pushDateObjectKey(keys, addDays(easter, 39));
+      if (/\bpaques\b/.test(normalized)) pushDateObjectKey(keys, addDays(easter, 1));
+      if (/\bpentecote\b/.test(normalized)) pushDateObjectKey(keys, addDays(easter, 50));
+
+      return keys.filter(Number.isFinite);
+    }
+
+    function monthNumber(value) {
+      const token = comparable(value).replace(/\./g, "");
+      return MONTH_INDEX[token] || Number.NaN;
+    }
+
+    function pushDateKey(keys, day, month, yearValue, semester) {
+      if (!Number.isFinite(day) || !Number.isFinite(month)) return;
+      if (day < 1 || day > 31 || month < 1 || month > 12) return;
+      let year = Number(yearValue);
+      if (yearValue && year < 100) year += 2000;
+      if (!yearValue || !Number.isFinite(year)) year = inferYearForMonth(month, semester);
+      keys.push(year * 10000 + month * 100 + day);
+    }
+
+    function pushDateObjectKey(keys, date) {
+      if (!(date instanceof Date) || Number.isNaN(date.getTime())) return;
+      keys.push(date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate());
+    }
+
+    function addDays(date, days) {
+      const copy = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      copy.setDate(copy.getDate() + days);
+      return copy;
+    }
+
+    function easterSunday(year) {
+      const a = year % 19;
+      const b = Math.floor(year / 100);
+      const c = year % 100;
+      const d = Math.floor(b / 4);
+      const e = b % 4;
+      const f = Math.floor((b + 8) / 25);
+      const g = Math.floor((b - f + 1) / 3);
+      const h = (19 * a + b - d - g + 15) % 30;
+      const i = Math.floor(c / 4);
+      const k = c % 4;
+      const l = (32 + 2 * e + 2 * i - h - k) % 7;
+      const m = Math.floor((a + 11 * h + 22 * l) / 451);
+      const month = Math.floor((h + l - 7 * m + 114) / 31);
+      const day = ((h + l - 7 * m + 114) % 31) + 1;
+      return new Date(year, month - 1, day);
+    }
+
+    function inferYearForMonth(month) {
+      return month >= 8 ? state.academicStartYear : state.academicStartYear + 1;
+    }
+
+    function inferAcademicStartYear(rows) {
+      const starts = [];
+      const explicitDate = /\b(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})\b/g;
+      const explicitText = new RegExp(`\\b(\\d{1,2})\\s+(${MONTH_PATTERN})\\s*(?:de\\s+)?(\\d{4})`, "g");
+      for (const row of rows) {
+        const text = normalizeDateText([row.commentaire, row.ec, row.code].join(" "));
+        let match;
+        while ((match = explicitDate.exec(text))) {
+          const month = Number(match[2]);
+          const year = Number(match[3]);
+          if (Number.isFinite(month) && Number.isFinite(year)) starts.push(month >= 8 ? year : year - 1);
+        }
+        while ((match = explicitText.exec(text))) {
+          const month = monthNumber(match[2]);
+          const year = Number(match[3]);
+          if (Number.isFinite(month) && Number.isFinite(year)) starts.push(month >= 8 ? year : year - 1);
+        }
+      }
+      if (starts.length) return mostFrequentStartYear(starts);
+      return currentAcademicStartYear();
+    }
+
+    function mostFrequentStartYear(starts) {
+      const counts = new Map();
+      for (const year of starts) counts.set(year, (counts.get(year) || 0) + 1);
+      return Array.from(counts.entries()).sort((a, b) => (b[1] - a[1]) || (b[0] - a[0]))[0][0];
+    }
+
+    function currentAcademicStartYear() {
+      const now = new Date();
+      const month = now.getMonth() + 1;
+      return month >= 8 ? now.getFullYear() : now.getFullYear() - 1;
     }
 
     function sortSemesterValues(a, b) {
       const rankA = semesterRank(a);
       const rankB = semesterRank(b);
-      return (rankA - rankB) || compareText(String(a), String(b));
+      return (rankA - rankB) || String(a).localeCompare(String(b), "fr", { numeric: true, sensitivity: "base" });
     }
 
     function semesterRank(value) {
@@ -1644,23 +1842,14 @@
     }
 
     function formatSemester(value) {
-      if (value === "non_renseigne") return "Semestre non renseigné";
-      const text = clean(value);
-      const number = text.match(/\d+/);
-      if (number) return `semestre ${number[0]}`;
-      return text || "Semestre non renseigné";
+      const raw = clean(value);
+      if (!raw || raw === "non_renseigne") return "Semestre non renseigné";
+      if (/^s?\d+$/i.test(raw)) return `Semestre ${raw.replace(/\D/g, "")}`;
+      return raw;
     }
 
     function sortUeLabels(a, b) {
-      const rankA = ueRank(a);
-      const rankB = ueRank(b);
-      return (rankA - rankB) || compareText(a, b);
-    }
-
-    function ueRank(value) {
-      const text = stripAccents(value);
-      const match = text.match(/(?:^|\b)ue\s*([1-6])(?:\b|$)/i) || text.match(/(?:^|\b)([1-6])(?:\b|$)/);
-      return match ? Number(match[1]) : 999;
+      return String(a).localeCompare(String(b), "fr", { numeric: true, sensitivity: "base" });
     }
 
     function colorForUe(ue) {
@@ -1668,51 +1857,219 @@
       return value && state.ueColors.has(value) ? state.ueColors.get(value) : "var(--ue-neutral)";
     }
 
-    function compareText(a, b) {
-      return String(a || "").localeCompare(String(b || ""), "fr", { numeric: true, sensitivity: "base" });
+    function scheduleFullDayHeightSync() {
+      window.cancelAnimationFrame(fullDayHeightSyncFrame);
+      window.clearTimeout(fullDayHeightSyncTimeout);
+      fullDayHeightSyncFrame = window.requestAnimationFrame(() => {
+        fullDayHeightSyncFrame = 0;
+        syncFullDaySpanHeights();
+        window.requestAnimationFrame(syncFullDaySpanHeights);
+      });
+      fullDayHeightSyncTimeout = window.setTimeout(syncFullDaySpanHeights, 180);
     }
 
-    function formatHours(value) {
-      const number = Number(value || 0);
-      if (!Number.isFinite(number)) return "0";
-      const rounded = Math.round(number * 100) / 100;
-      return String(rounded).replace(".", ",");
+    function syncFullDaySpanHeights() {
+      const cells = Array.from(document.querySelectorAll(".full-day-span"));
+      if (!cells.length) return;
+
+      for (const cell of cells) {
+        const fill = cell.querySelector(".full-day-fill");
+        cell.style.removeProperty("--full-day-px-height");
+        if (fill) {
+          fill.style.removeProperty("height");
+          fill.style.removeProperty("min-height");
+        }
+      }
+
+      document.body.offsetHeight;
+
+      for (const cell of cells) {
+        const fill = cell.querySelector(".full-day-fill");
+        const row = cell.parentElement;
+        const tbody = row && row.parentElement;
+        if (!fill || !tbody || !tbody.rows) continue;
+
+        const rows = Array.from(tbody.rows);
+        const startIndex = rows.indexOf(row);
+        const span = Math.max(1, Number(cell.getAttribute("rowspan")) || Number(cell.dataset.spanCount) || 1);
+        const spannedRows = rows.slice(Math.max(0, startIndex), Math.max(0, startIndex) + span);
+        const rowsHeight = spannedRows.reduce((total, currentRow) => total + currentRow.getBoundingClientRect().height, 0);
+        const computed = window.getComputedStyle(cell);
+        const verticalPadding = (parseFloat(computed.paddingTop) || 0) + (parseFloat(computed.paddingBottom) || 0);
+        const verticalBorder = (parseFloat(computed.borderTopWidth) || 0) + (parseFloat(computed.borderBottomWidth) || 0);
+        const height = Math.max(1, Math.floor(rowsHeight - verticalPadding - verticalBorder));
+        if (!Number.isFinite(height) || height <= 0) continue;
+
+        fill.style.height = `${height}px`;
+        fill.style.minHeight = `${height}px`;
+      }
     }
 
-    function round(value, digits = 2) {
-      const factor = 10 ** digits;
-      return Math.round(value * factor) / factor;
+    async function exportElementToPng(element, filename) {
+      if (!element) return;
+      try {
+        setStatus("Préparation de l’export PNG…");
+        scheduleFullDayHeightSync();
+        await ensureHtml2Canvas();
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        syncFullDaySpanHeights();
+        const hidden = element.querySelectorAll(".no-export");
+        hidden.forEach(node => { node.dataset.previousDisplay = node.style.display; node.style.display = "none"; });
+        const canvas = await window.html2canvas(element, {
+          backgroundColor: "#ffffff",
+          scale: Math.min(2, window.devicePixelRatio || 1.5),
+          useCORS: true
+        });
+        hidden.forEach(node => { node.style.display = node.dataset.previousDisplay || ""; delete node.dataset.previousDisplay; });
+        const link = document.createElement("a");
+        link.download = filename;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        setLoadedStatus("Export PNG généré.");
+      } catch (error) {
+        showError("Impossible de générer le PNG. Vérifiez que la page a accès à Internet pour charger la bibliothèque d’export.", error);
+      }
     }
 
-    function clean(value) {
-      return String(value ?? "").replace(/\s+/g, " ").trim();
+    function ensureHtml2Canvas() {
+      if (window.html2canvas) return Promise.resolve();
+      return new Promise((resolve, reject) => {
+        const existing = document.querySelector(`script[src="${HTML2CANVAS_URL}"]`);
+        if (existing) {
+          existing.addEventListener("load", resolve, { once: true });
+          existing.addEventListener("error", reject, { once: true });
+          return;
+        }
+        const script = document.createElement("script");
+        script.src = HTML2CANVAS_URL;
+        script.async = true;
+        script.onload = resolve;
+        script.onerror = () => reject(new Error("html2canvas n’a pas pu être chargé."));
+        document.head.appendChild(script);
+      });
     }
 
-    function stripAccents(value) {
-      return String(value ?? "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
+    function exportWorkbook() {
+      if (!state.rows.length) return;
+      const xml = buildExcelXml();
+      const blob = new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "m1-cen-emploi-du-temps.xls";
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      setLoadedStatus("Export XLS généré.");
     }
 
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    function buildExcelXml() {
+      const worksheets = [];
+      const entryRows = state.rows.filter(row => headerDayType(row) === "date_rentree").slice().sort(compareRowsByDateThenSource);
+      if (entryRows.length) {
+        worksheets.push(worksheetXml("Dates de rentrée", ["Semestre", "Commentaire", "EC", "Code", "Enseignant"], entryRows.map(row => [
+          formatSemester(row.semestre),
+          row.commentaire,
+          row.ec,
+          row.code,
+          row.enseignant
+        ])));
+      }
+
+      for (const semester of state.semesters) {
+        const semesterRows = state.rows.filter(row => (clean(row.semestre) || "non_renseigne") === semester && !headerDayType(row));
+        const weeklyRows = semesterRows.filter(row => !specialDayType(row) && !isIntensive(row));
+        const intensiveRows = semesterRows.filter(row => isIntensive(row));
+
+        worksheets.push(worksheetXml(`${shortSemesterName(semester)} calendrier`, ["Semestre", "Créneau", "Jour", "EC", "Code", "Enseignant", "Salle", "vh", "UE", "Commentaire"], weeklyRows.slice().sort(sortCourses).map(row => [
+          formatSemester(row.semestre),
+          `${formatTime(row.heure_debut)} – ${formatTime(row.heure_fin)}`,
+          JOUR_LABELS[normalizeDay(row.jour)] || row.jour,
+          row.ec,
+          row.code,
+          row.enseignant,
+          row.salle,
+          hoursForRow(row) || row.nb_heures,
+          row.ue,
+          row.commentaire
+        ])));
+
+        worksheets.push(worksheetXml(`${shortSemesterName(semester)} intensives`, ["Commentaire", "EC", "Code", "Enseignant", "vh", "UE"], simpleRowsForWorksheet(intensiveRows, semester).map(row => [
+          row.commentaire || "Sans commentaire", row.ec, row.code, row.enseignant, hoursForRow(row) || row.nb_heures, row.ue
+        ])));
+
+        for (const type of SPECIAL_DAY_TYPES) {
+          const specialRows = semesterRows.filter(row => specialDayType(row) === type.key);
+          worksheets.push(worksheetXml(`${shortSemesterName(semester)} ${type.label}`, ["Commentaire", "EC", "Code", "Enseignant", "vh", "UE"], simpleRowsForWorksheet(specialRows, semester).map(row => [
+            row.commentaire || "Sans commentaire", row.ec, row.code, row.enseignant, hoursForRow(row) || row.nb_heures, row.ue
+          ])));
+        }
+      }
+
+      worksheets.push(worksheetXml("Liste EC", ["Semestre", "EC", "Code", "Enseignant(s)", "vh", "#"], getSortedEcRows().map(row => [
+        formatSemester(row.semestre),
+        row.ec,
+        row.code,
+        row.enseignants.join(" ; "),
+        row.nb_heures,
+        state.selectedEcIds.has(row.id) ? "oui" : "non"
+      ])));
+
+      worksheets.push(worksheetXml("CSV brut", REQUIRED_COLUMNS, state.rows.map(row => REQUIRED_COLUMNS.map(column => row[column]))));
+
+      return `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <Styles>
+    <Style ss:ID="Header"><Font ss:Bold="1"/><Interior ss:Color="#E9F0F8" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/></Borders></Style>
+    <Style ss:ID="Text"><Alignment ss:Vertical="Top" ss:WrapText="1"/></Style>
+    <Style ss:ID="Number"><NumberFormat ss:Format="0.##"/><Alignment ss:Vertical="Top"/></Style>
+  </Styles>
+  ${worksheets.join("\n")}
+</Workbook>`;
     }
 
-    function attributeSafe(value) {
-      return String(value ?? "").replace(/[\u0000-\u001F\u007F]/g, "");
+    function simpleRowsForWorksheet(rows, semester) {
+      return groupRowsByComment(rows, semester, true).flatMap(group => group.rows.slice().sort(sortCourses));
     }
 
-    function slugify(value) {
-      const slug = stripAccents(value)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
-      return slug || "non-renseigne";
+    function worksheetXml(name, headers, rows) {
+      const safeName = xmlEscape(safeWorksheetName(name));
+      const headerRow = `<Row>${headers.map(header => `<Cell ss:StyleID="Header"><Data ss:Type="String">${xmlEscape(header)}</Data></Cell>`).join("")}</Row>`;
+      const bodyRows = rows.map(row => `<Row>${row.map(value => cellXml(value)).join("")}</Row>`).join("\n");
+      return `<Worksheet ss:Name="${safeName}"><Table>${headerRow}${bodyRows}</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><FreezePanes/><FrozenNoSplit/><SplitHorizontal>1</SplitHorizontal><TopRowBottomPane>1</TopRowBottomPane></WorksheetOptions></Worksheet>`;
+    }
+
+    function cellXml(value) {
+      if (typeof value === "number" && Number.isFinite(value)) return `<Cell ss:StyleID="Number"><Data ss:Type="Number">${value}</Data></Cell>`;
+      const parsed = parseHours(value);
+      if (Number.isFinite(parsed) && String(value).trim().match(/^[\d,.\s]+h?$/i)) return `<Cell ss:StyleID="Number"><Data ss:Type="Number">${parsed}</Data></Cell>`;
+      return `<Cell ss:StyleID="Text"><Data ss:Type="String">${xmlEscape(value ?? "")}</Data></Cell>`;
+    }
+
+    function safeWorksheetName(name) {
+      return String(name || "Feuille")
+        .replace(/[\\/?*\[\]:]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 31) || "Feuille";
+    }
+
+    function shortSemesterName(value) {
+      const number = String(value || "").match(/\d+/);
+      return number ? `S${number[0]}` : "Semestre";
+    }
+
+    function updateExportButtons(enabled) {
+      exportPngButton.disabled = !enabled;
+      exportXlsButton.disabled = !enabled;
+    }
+
+    function setLoadedStatus(extra = "") {
+      const suffix = extra ? ` ${escapeHtml(extra)}` : "";
+      setStatus(`<strong>${state.rows.length}</strong> ligne(s) chargée(s) depuis ${escapeHtml(state.sourceLabel)}.${suffix}`, "");
     }
 
     function setStatus(message, type = "") {
@@ -1724,225 +2081,37 @@
       console.error(message, error);
       app.innerHTML = `<p class="notice warning">${escapeHtml(message)}</p>`;
       setStatus(`${escapeHtml(message)}${error ? ` <span class="muted">${escapeHtml(error.message || String(error))}</span>` : ""}`, "error");
-      updateExportButtons(false);
     }
 
-    function setLoadedStatus(extra = "") {
-      const message = `<strong>${state.rows.length}</strong> ligne(s) chargée(s) depuis ${escapeHtml(state.sourceLabel)}.`;
-      setStatus(extra ? `${message} ${escapeHtml(extra)}` : message, "");
+    function slugify(value) {
+      return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "export";
     }
 
-    function updateExportButtons(enabled) {
-      exportPngButton.disabled = !enabled;
-      exportXlsButton.disabled = !enabled;
+    function round(value, digits = 2) {
+      const factor = 10 ** digits;
+      return Math.round(value * factor) / factor;
     }
 
-    async function exportElementToPng(element, filename) {
-      if (!element || !state.rows.length) return;
-      setStatus("Préparation de l’export PNG…");
-      try {
-        if (document.fonts && document.fonts.ready) await document.fonts.ready;
-        const rect = element.getBoundingClientRect();
-        const width = Math.max(Math.ceil(element.scrollWidth), Math.ceil(rect.width), 1);
-        const height = Math.max(Math.ceil(element.scrollHeight), Math.ceil(rect.height), 1);
-        const clone = element.cloneNode(true);
-        clone.querySelectorAll(".no-export, [data-export-skip]").forEach(node => node.remove());
-        clone.querySelectorAll("input[type='checkbox']").forEach(input => {
-          if (input.checked) input.setAttribute("checked", "checked");
-          else input.removeAttribute("checked");
-        });
-        clone.style.width = `${width}px`;
-        clone.style.margin = "0";
-        clone.style.boxShadow = "none";
-
-        const css = collectCssForExport();
-        const serialized = new XMLSerializer().serializeToString(clone);
-        const svg = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-            <foreignObject width="100%" height="100%">
-              <div xmlns="http://www.w3.org/1999/xhtml" style="background:#ffffff;width:${width}px;min-height:${height}px;">
-                <style>${escapeXml(css)}</style>
-                ${serialized}
-              </div>
-            </foreignObject>
-          </svg>`;
-        const svgBlob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
-        const url = URL.createObjectURL(svgBlob);
-        const image = new Image();
-        const scale = Math.max(.35, Math.min(2, window.devicePixelRatio || 1, 16384 / width, 16384 / height));
-        await new Promise((resolve, reject) => {
-          image.onload = resolve;
-          image.onerror = () => reject(new Error("Le rendu SVG n’a pas pu être converti en image."));
-          image.src = url;
-        });
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.ceil(width * scale);
-        canvas.height = Math.ceil(height * scale);
-        const context = canvas.getContext("2d");
-        context.fillStyle = "#ffffff";
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(image, 0, 0, canvas.width, canvas.height);
-        URL.revokeObjectURL(url);
-        const pngBlob = await new Promise((resolve, reject) => {
-          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Impossible de créer le PNG.")), "image/png");
-        });
-        downloadBlob(pngBlob, filename || "export.png", "image/png");
-        setLoadedStatus("Export PNG prêt.");
-      } catch (error) {
-        console.error(error);
-        setStatus(`Export PNG impossible : ${escapeHtml(error.message || String(error))}`, "error");
-      }
+    function escapeRegExp(value) {
+      return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
 
-    function collectCssForExport() {
-      return Array.from(document.querySelectorAll("style")).map(style => style.textContent).join("\n");
-    }
-
-    function exportWorkbook() {
-      if (!state.rows.length) return;
-      const sheets = [];
-      for (const semester of state.semesters) {
-        const rows = state.rows.filter(row => (clean(row.semestre) || "non_renseigne") === semester);
-        const label = formatSemester(semester);
-        sheets.push(renderCalendarXlsSheet(`Calendrier ${label}`, rows));
-        sheets.push(renderSpecialXlsSheet(`Intensives ${label}`, rows.filter(row => isIntensive(row))));
-        for (const def of SPECIAL_DAY_DEFINITIONS) {
-          sheets.push(renderSpecialXlsSheet(`${def.title} ${label}`, rows.filter(row => specialDayKey(row.jour) === def.key)));
-        }
-      }
-      sheets.push(renderEcXlsSheet());
-      sheets.push(renderRawXlsSheet());
-
-      const workbook = `<?xml version="1.0" encoding="UTF-8"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
-  xmlns:o="urn:schemas-microsoft-com:office:office"
-  xmlns:x="urn:schemas-microsoft-com:office:excel"
-  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
-  xmlns:html="http://www.w3.org/TR/REC-html40">
-  <Styles>
-    <Style ss:ID="Header"><Font ss:Bold="1"/><Interior ss:Color="#e9f0f8" ss:Pattern="Solid"/></Style>
-    <Style ss:ID="Wrap"><Alignment ss:WrapText="1" ss:Vertical="Top"/></Style>
-    <Style ss:ID="Number"><NumberFormat ss:Format="0.00"/></Style>
-  </Styles>
-  ${sheets.join("\n")}
-</Workbook>`;
-      downloadBlob(new Blob([workbook], { type: "application/vnd.ms-excel;charset=utf-8" }), "m1-cen-emploi-du-temps.xls", "application/vnd.ms-excel");
-    }
-
-    function renderCalendarXlsSheet(title, rows) {
-      const weeklyRows = rows.filter(row => isWeeklyRow(row) && isValidTimeRange(row));
-      const slots = uniqueSlots(weeklyRows);
-      const buckets = new Map();
-      for (const row of weeklyRows) {
-        const rowSlot = slotFor(row);
-        const targetSlots = isFullDaySlot(rowSlot)
-          ? slots.filter(slot => isSlotContainedWithin(slot, rowSlot))
-          : [rowSlot];
-        for (const slot of targetSlots) {
-          const key = `${slot.key}__${normalizeDay(row.jour)}`;
-          if (!buckets.has(key)) buckets.set(key, []);
-          buckets.get(key).push(row);
-        }
-      }
-      const tableRows = [xlsRow(["Créneau", ...JOURS.map(day => JOUR_LABELS[day])], true)];
-      for (const slot of slots) {
-        tableRows.push(xlsRow([slot.label, ...JOURS.map(day => plainCourseText(buckets.get(`${slot.key}__${day}`) || []))]));
-      }
-      if (!slots.length) tableRows.push(xlsRow(["Aucun cours hebdomadaire renseigné"]));
-      return xlsWorksheet(title, tableRows.join("\n"));
-    }
-
-    function renderSpecialXlsSheet(title, rows) {
-      const tableRows = [xlsRow(["Commentaire", "EC / code / enseignant"], true)];
-      for (const [comment, groupRows] of groupByComment(rows)) {
-        tableRows.push(xlsRow([comment, groupRows.sort(sortCourses).map(row => [row.ec, row.code, row.enseignant].filter(Boolean).join("\n")).join("\n\n")]));
-      }
-      if (!rows.length) tableRows.push(xlsRow(["Aucune ligne renseignée"]));
-      return xlsWorksheet(title, tableRows.join("\n"));
-    }
-
-    function renderEcXlsSheet() {
-      const tableRows = [xlsRow(["Semestre", "EC", "Code", "Enseignant(s)", "vh", "#"], true)];
-      for (const row of sortedEcRows()) {
-        tableRows.push(xlsRow([
-          formatSemester(row.semestre),
-          row.ec,
-          row.code,
-          row.enseignants.join("\n"),
-          row.nb_heures,
-          state.selectedEcIds.has(row.id) ? "oui" : "non"
-        ], false, [4]));
-      }
-      tableRows.push(xlsRow(["", "", "", "Total sélectionné", selectedHoursTotal(), ""], false, [4]));
-      return xlsWorksheet("Liste EC", tableRows.join("\n"));
-    }
-
-    function renderRawXlsSheet() {
-      const tableRows = [xlsRow(REQUIRED_COLUMNS, true)];
-      for (const row of state.rows) tableRows.push(xlsRow(REQUIRED_COLUMNS.map(column => row[column])));
-      return xlsWorksheet("CSV brut", tableRows.join("\n"));
-    }
-
-    function plainCourseText(rows) {
-      return rows.sort(sortCourses).map(row => [
-        row.ec,
-        row.code,
-        row.enseignant,
-        row.salle ? `Salle : ${row.salle}` : "",
-        row.nb_heures ? `${row.nb_heures} h` : "",
-        row.commentaire
-      ].filter(Boolean).join(" — ")).join("\n");
-    }
-
-    function xlsWorksheet(name, rowsXml) {
-      return `<Worksheet ss:Name="${xmlEscape(sheetName(name))}"><Table>${rowsXml}</Table></Worksheet>`;
-    }
-
-    function xlsRow(values, isHeader = false, numericIndexes = []) {
-      return `<Row>${values.map((value, index) => xlsCell(value, isHeader, numericIndexes.includes(index))).join("")}</Row>`;
-    }
-
-    function xlsCell(value, isHeader = false, numeric = false) {
-      const number = Number(value);
-      const isNumeric = numeric && Number.isFinite(number);
-      const style = isHeader ? "Header" : (isNumeric ? "Number" : "Wrap");
-      const type = isNumeric ? "Number" : "String";
-      const content = isNumeric ? String(Math.round(number * 100) / 100) : xmlEscape(value ?? "");
-      return `<Cell ss:StyleID="${style}"><Data ss:Type="${type}">${content}</Data></Cell>`;
-    }
-
-    function sheetName(name) {
-      const cleaned = String(name || "Feuille").replace(/[\\/?*\[\]:]/g, " ").slice(0, 31).trim();
-      return cleaned || "Feuille";
-    }
-
-    function downloadBlob(blob, filename, mimeType) {
-      const typedBlob = blob instanceof Blob && blob.type ? blob : new Blob([blob], { type: mimeType || "application/octet-stream" });
-      const url = URL.createObjectURL(typedBlob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }
-
-    function escapeXml(value) {
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
-
-    function xmlEscape(value) {
+    function escapeHtml(value) {
       return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
-        .replace(/'/g, "&apos;");
+        .replace(/'/g, "&#039;");
+    }
+
+    function xmlEscape(value) {
+      return escapeHtml(value).replace(/\u000b/g, " ");
     }
   </script>
 </body>
