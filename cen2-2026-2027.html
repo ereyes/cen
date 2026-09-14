@@ -751,7 +751,7 @@
     sourceLink.href = CSV_URL;
 
     reloadButton.addEventListener("click", () => loadRemoteData());
-    exportPngButton.addEventListener("click", () => exportElementToPng(app, "m1-cen-emploi-du-temps.png"));
+    exportPngButton.addEventListener("click", () => exportElementToPng(app, "m2-cen-emploi-du-temps.png"));
     exportXlsButton.addEventListener("click", () => exportWorkbook());
 
     csvFile.addEventListener("change", async event => {
@@ -1312,7 +1312,7 @@
               <p>Version HTML du CSV : EC, code, enseignant(s) et volume horaire, hors lignes « jours fériés » et « date de rentrée ». Cliquez sur un en-tête pour trier.</p>
             </div>
             <div class="section-actions no-export">
-              <button class="button small" type="button" data-export-png="ec-directory" data-export-name="m1-cen-liste-ec.png">Exporter la liste en PNG</button>
+              <button class="button small" type="button" data-export-png="ec-directory" data-export-name="m2-cen-liste-ec.png">Exporter la liste en PNG</button>
             </div>
           </div>
           <div class="hours-panel" id="hoursPanel">
@@ -1955,7 +1955,7 @@
       const blob = new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = "m1-cen-emploi-du-temps.xls";
+      link.download = "m2-cen-emploi-du-temps.xls";
       link.click();
       setTimeout(() => URL.revokeObjectURL(link.href), 1000);
       setLoadedStatus("Export XLS généré.");
