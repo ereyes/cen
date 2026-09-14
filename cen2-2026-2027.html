@@ -156,8 +156,8 @@
       font-size: .95rem;
     }
 
-    .status strong { color: var(--ink); }
     .status.error { color: var(--warning); }
+    .status:empty { display: none; }
 
     .controls,
     .semester-actions,
@@ -169,8 +169,9 @@
       justify-content: flex-end;
     }
 
-    .button,
-    .file-button {
+    .status-row .controls { margin-left: auto; }
+
+    .button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -194,15 +195,12 @@
       font-size: .82rem;
     }
 
-    .button:hover,
-    .file-button:hover { border-color: var(--accent); }
+    .button:hover { border-color: var(--accent); }
 
     .button:disabled {
       opacity: .45;
       cursor: not-allowed;
     }
-
-    .file-button input { display: none; }
 
     main {
       display: grid;
@@ -276,7 +274,7 @@
     }
 
     th {
-      background: var(--accent-soft);
+      background: bisque;
       color: var(--ink);
       font-weight: 750;
     }
@@ -531,7 +529,7 @@
       background: #fff;
     }
 
-    .ec-table th { background: var(--accent-soft); }
+    .ec-table th { background: bisque; }
 
     .sort-button {
       display: inline-flex;
@@ -586,12 +584,23 @@
     .muted { color: var(--muted); }
 
     footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
       margin-top: 18px;
       color: var(--muted);
       font-size: .86rem;
     }
 
-    footer a { color: var(--accent); }
+    .footer-title {
+      margin: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    footer .button { color: var(--accent); }
 
     @media (max-width: 1000px) {
       .day-long { display: none; }
@@ -605,8 +614,7 @@
       header,
       .semester,
       .data-section { padding: 14px 10px; border-radius: 10px; }
-      .button,
-      .file-button { min-height: 32px; padding: 0 9px; font-size: .76rem; }
+      .button { min-height: 32px; padding: 0 9px; font-size: .76rem; }
       .button.small { min-height: 28px; padding: 0 7px; font-size: .68rem; }
       .jump-menu a { min-height: 28px; padding: 0 9px; font-size: .75rem; }
       .start-dates { padding: 9px 10px; font-size: clamp(.76rem, .55rem + .9vw, .9rem); }
@@ -674,10 +682,8 @@
       <div class="status-row">
         <p class="status" id="status">Initialisation…</p>
         <div class="controls no-export">
-          <button class="button" type="button" id="reloadButton">Recharger</button>
           <button class="button" type="button" id="exportPngButton" disabled>Exporter PNG</button>
           <button class="button" type="button" id="exportXlsButton" disabled>Exporter XLS</button>
-          <label class="file-button">Charger CSV local<input type="file" id="csvFile" accept=".csv,text/csv"></label>
         </div>
       </div>
     </header>
@@ -685,13 +691,14 @@
     <main id="app" aria-live="polite"></main>
 
     <footer>
-      Source : <a id="sourceLink" href="#" target="_blank" rel="noopener">tableau CSV publié</a>. Les dates de rentrée sont affichées dans l’en-tête. Les semaines intensives, jours fériés et suivis de mémoire sont affichés dans des tableaux dédiés ; les semaines intensives et jours fériés sont triés chronologiquement à partir des dates lisibles dans les commentaires quand elles existent. L’export XLS est produit au format Excel XML compatible avec Excel.
+      <p class="footer-title">M2 Création et expérience numériques</p>
+      <a class="button" href="https://humanites-numeriques.univ-paris8.fr/-Masters-CEN-" target="_blank" rel="noopener noreferrer">Site officiel du CEN</a>
     </footer>
   </div>
 
   <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTkZ-3vxGMjgYrK-PLeVwUlCvG8mNS4fh0YtuiMquTG2yLtwDTiBOSxluW_7cle49MIhaYruzBfNX3C/pub?gid=646851629&single=true&output=csv";
-    const GVIZ_FALLBACK_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTkZ-3vxGMjgYrK-PLeVwUlCvG8mNS4fh0YtuiMquTG2yLtwDTiBOSxluW_7cle49MIhaYruzBfNX3C/pub?gid=646851629&headers=1&tqx=out:json;responseHandler:__m1CenGviz";
+    const GVIZ_FALLBACK_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTkZ-3vxGMjgYrK-PLeVwUlCvG8mNS4fh0YtuiMquTG2yLtwDTiBOSxluW_7cle49MIhaYruzBfNX3C/pub?gid=646851629&headers=1&tqx=out:json;responseHandler:__m2CenGviz";
     const HTML2CANVAS_URL = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
 
     const JOURS = ["lundi", "mardi", "mercredi", "jeudi", "vendredi"];
@@ -730,11 +737,8 @@
     const app = document.getElementById("app");
     const startDates = document.getElementById("startDates");
     const statusEl = document.getElementById("status");
-    const sourceLink = document.getElementById("sourceLink");
-    const reloadButton = document.getElementById("reloadButton");
     const exportPngButton = document.getElementById("exportPngButton");
     const exportXlsButton = document.getElementById("exportXlsButton");
-    const csvFile = document.getElementById("csvFile");
 
     const state = {
       rows: [],
@@ -744,27 +748,11 @@
       ueColors: new Map(),
       sortKey: "semestre",
       sortDir: "asc",
-      sourceLabel: "",
       academicStartYear: currentAcademicStartYear()
     };
 
-    sourceLink.href = CSV_URL;
-
-    reloadButton.addEventListener("click", () => loadRemoteData());
     exportPngButton.addEventListener("click", () => exportElementToPng(app, "m2-cen-emploi-du-temps.png"));
     exportXlsButton.addEventListener("click", () => exportWorkbook());
-
-    csvFile.addEventListener("change", async event => {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-      try {
-        setStatus(`Chargement du fichier local : ${file.name}…`);
-        const text = await file.text();
-        renderRows(csvToRows(text), `fichier local « ${file.name} »`);
-      } catch (error) {
-        showError("Impossible de lire le CSV local.", error);
-      }
-    });
 
     app.addEventListener("click", event => {
       const sortButton = event.target.closest("[data-sort-key]");
@@ -811,14 +799,14 @@
         const response = await fetch(CSV_URL, { cache: "no-store" });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const text = await response.text();
-        renderRows(csvToRows(text), "CSV publié");
+        renderRows(csvToRows(text));
       } catch (csvError) {
         setStatus("Le chargement CSV direct a échoué ; tentative via l’API de visualisation Google…");
         try {
           const rows = await loadViaGviz();
-          renderRows(rows, "API de visualisation Google");
+          renderRows(rows);
         } catch (gvizError) {
-          showError("Aucune donnée n’a pu être chargée automatiquement. Utilisez le bouton « Charger CSV local ».", gvizError);
+          showError("Impossible de charger les données. Vérifiez la connexion puis actualisez la page.", gvizError);
         }
       }
     }
@@ -833,7 +821,7 @@
           }
         }, 12000);
 
-        window.__m1CenGviz = payload => {
+        window.__m2CenGviz = payload => {
           if (settled) return;
           settled = true;
           window.clearTimeout(timeout);
@@ -847,7 +835,7 @@
         window.google = window.google || {};
         window.google.visualization = window.google.visualization || {};
         window.google.visualization.Query = window.google.visualization.Query || {};
-        window.google.visualization.Query.setResponse = window.__m1CenGviz;
+        window.google.visualization.Query.setResponse = window.__m2CenGviz;
 
         const script = document.createElement("script");
         script.src = GVIZ_FALLBACK_URL + "&cacheBust=" + Date.now();
@@ -983,7 +971,7 @@
       return REQUIRED_COLUMNS.some(column => clean(row[column]) !== "");
     }
 
-    function renderRows(rows, sourceLabel) {
+    function renderRows(rows) {
       const normalizedRows = rows.map((row, index) => normalizeRow(row, index)).filter(hasMeaningfulValue);
       if (!normalizedRows.length) {
         state.rows = [];
@@ -999,7 +987,6 @@
       }
 
       state.rows = normalizedRows;
-      state.sourceLabel = sourceLabel;
       state.academicStartYear = inferAcademicStartYear(normalizedRows);
       state.ueColors = buildUeColorMap(normalizedRows.filter(row => !headerDayType(row)));
       renderHeaderInfo(normalizedRows);
@@ -1090,7 +1077,7 @@
           <div class="semester-heading">
             <h2>${escapeHtml(semesterTitle)}</h2>
             <div class="semester-actions no-export">
-              <button class="button small" type="button" data-export-png="${id}" data-export-name="m1-cen-${slugify(semesterTitle)}.png">Exporter ce semestre en PNG</button>
+              <button class="button small" type="button" data-export-png="${id}" data-export-name="m2-cen-${slugify(semesterTitle)}.png">Exporter ce semestre en PNG</button>
             </div>
           </div>
           <div class="block-title">Calendrier hebdomadaire <span class="count">${weeklyRows.length} ligne(s)</span></div>
@@ -2068,8 +2055,7 @@
     }
 
     function setLoadedStatus(extra = "") {
-      const suffix = extra ? ` ${escapeHtml(extra)}` : "";
-      setStatus(`<strong>${state.rows.length}</strong> ligne(s) chargée(s) depuis ${escapeHtml(state.sourceLabel)}.${suffix}`, "");
+      setStatus(extra ? escapeHtml(extra) : "", "");
     }
 
     function setStatus(message, type = "") {
