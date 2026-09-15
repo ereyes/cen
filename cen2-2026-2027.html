@@ -93,7 +93,7 @@
       margin-top: 16px;
       padding: 12px 14px;
       border-left: 4px solid var(--accent);
-      background: var(--accent-soft);
+      background: bisque;
       color: var(--ink);
       font-size: clamp(.9rem, 1.4vw, 1rem);
     }
@@ -246,12 +246,6 @@
     }
 
     .block-title:first-of-type { margin-top: 0; }
-
-    .count {
-      color: var(--muted);
-      font-size: .85em;
-      font-weight: 500;
-    }
 
     .table-wrap {
       width: 100%;
@@ -602,6 +596,13 @@
 
     footer .button { color: var(--accent); }
 
+    .external-icon {
+      width: .88em;
+      height: .88em;
+      margin-left: 6px;
+      flex: 0 0 auto;
+    }
+
     @media (max-width: 1000px) {
       .day-long { display: none; }
       .day-short { display: inline-block; }
@@ -692,7 +693,22 @@
 
     <footer>
       <p class="footer-title">M2 Création et expérience numériques</p>
-      <a class="button" href="https://humanites-numeriques.univ-paris8.fr/-Masters-CEN-" target="_blank" rel="noopener noreferrer">Site officiel du CEN</a>
+      <a class="button" href="https://humanites-numeriques.univ-paris8.fr/-Masters-CEN-" target="_blank" rel="noopener noreferrer" aria-label="Site officiel du CEN — ouvre dans un nouvel onglet">
+        Site officiel du CEN
+        <svg class="external-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 3h7v7"></path>
+          <path d="M10 14 21 3"></path>
+          <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"></path>
+        </svg>
+      </a>
+      <a class="button" href="https://www.univ-paris8.fr/IMG/pdf/calendrier-fermetures-annuelles.pdf" target="_blank" rel="noopener noreferrer" aria-label="Calendrier universitaire 2026-2027 de Paris 8 — ouvre dans un nouvel onglet">
+        Calendrier universitaire 2026-2027 de Paris 8
+        <svg class="external-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 3h7v7"></path>
+          <path d="M10 14 21 3"></path>
+          <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"></path>
+        </svg>
+      </a>
     </footer>
   </div>
 
@@ -1080,14 +1096,14 @@
               <button class="button small" type="button" data-export-png="${id}" data-export-name="m2-cen-${slugify(semesterTitle)}.png">Exporter ce semestre en PNG</button>
             </div>
           </div>
-          <div class="block-title">Calendrier hebdomadaire <span class="count">${weeklyRows.length} ligne(s)</span></div>
+          <div class="block-title">Calendrier hebdomadaire</div>
           ${renderWeeklyCalendar(weeklyRows)}
-          <div class="block-title">Semaines intensives <span class="count">${intensiveRows.length} ligne(s)</span></div>
+          <div class="block-title">Semaines intensives</div>
           ${renderSimpleRows(intensiveRows, "Aucune semaine intensive renseignée pour ce semestre.", "intensives", semester, true)}
           ${SPECIAL_DAY_TYPES.map(type => {
             const specialRows = rows.filter(row => specialDayType(row) === type.key);
             return `
-              <div class="block-title">${escapeHtml(type.label)} <span class="count">${specialRows.length} ligne(s)</span></div>
+              <div class="block-title">${escapeHtml(type.label)}</div>
               ${renderSimpleRows(specialRows, type.empty, "special-table", semester, type.key === "jours_feries")}
             `;
           }).join("")}
@@ -1294,13 +1310,7 @@
       return `
         <section class="data-section" id="ec-directory">
           <div class="section-heading">
-            <div>
-              <h2>Liste des EC</h2>
-              <p>Version HTML du CSV : EC, code, enseignant(s) et volume horaire, hors lignes « jours fériés » et « date de rentrée ». Cliquez sur un en-tête pour trier.</p>
-            </div>
-            <div class="section-actions no-export">
-              <button class="button small" type="button" data-export-png="ec-directory" data-export-name="m2-cen-liste-ec.png">Exporter la liste en PNG</button>
-            </div>
+            <h2>Liste des EC</h2>
           </div>
           <div class="hours-panel" id="hoursPanel">
             <p class="hours-total"><strong>${formatHours(selectedTotal)}</strong> vh compté(s)</p>
