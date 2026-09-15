@@ -158,6 +158,8 @@
 
     .status strong { color: var(--ink); }
     .status.error { color: var(--warning); }
+    .status:empty { display: none; }
+    .status-row .controls { margin-left: auto; }
 
     .controls,
     .semester-actions,
@@ -586,12 +588,20 @@
     .muted { color: var(--muted); }
 
     footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
       margin-top: 18px;
       color: var(--muted);
       font-size: .86rem;
     }
 
     footer a { color: var(--accent); }
+    .footer-title { margin: 0; color: var(--accent); font-weight: 700; }
+    footer .button { white-space: normal; padding-top: 8px; padding-bottom: 8px; }
+    .external-icon { margin-left: 6px; flex: 0 0 auto; font-size: .9em; }
 
     @media (max-width: 1000px) {
       .day-long { display: none; }
@@ -674,10 +684,8 @@
       <div class="status-row">
         <p class="status" id="status">Initialisation…</p>
         <div class="controls no-export">
-          <button class="button" type="button" id="reloadButton">Recharger</button>
           <button class="button" type="button" id="exportPngButton" disabled>Exporter PNG</button>
           <button class="button" type="button" id="exportXlsButton" disabled>Exporter XLS</button>
-          <label class="file-button">Charger CSV local<input type="file" id="csvFile" accept=".csv,text/csv"></label>
         </div>
       </div>
     </header>
@@ -685,7 +693,9 @@
     <main id="app" aria-live="polite"></main>
 
     <footer>
-      Source : <a id="sourceLink" href="#" target="_blank" rel="noopener">tableau CSV publié</a>. Les dates de rentrée sont affichées dans l’en-tête. Les semaines intensives, jours fériés et suivis de mémoire sont affichés dans des tableaux dédiés ; les semaines intensives et jours fériés sont triés chronologiquement à partir des dates lisibles dans les commentaires quand elles existent. L’export XLS est produit au format Excel XML compatible avec Excel.
+      <p class="footer-title">M1 Création et expérience numériques</p>
+      <a class="button" href="https://humanites-numeriques.univ-paris8.fr/-Masters-CEN-" target="_blank" rel="noopener noreferrer" aria-label="Site officiel du CEN — ouvre dans un nouvel onglet">Site officiel du CEN <span class="external-icon" aria-hidden="true">↗</span></a>
+      <a class="button" href="https://www.univ-paris8.fr/IMG/pdf/calendrier-fermetures-annuelles.pdf" target="_blank" rel="noopener noreferrer" aria-label="Calendrier universitaire 2026-2027 de Paris 8 — ouvre dans un nouvel onglet">Calendrier universitaire 2026-2027 de Paris 8 <span class="external-icon" aria-hidden="true">↗</span></a>
     </footer>
   </div>
 
@@ -730,11 +740,8 @@
     const app = document.getElementById("app");
     const startDates = document.getElementById("startDates");
     const statusEl = document.getElementById("status");
-    const sourceLink = document.getElementById("sourceLink");
-    const reloadButton = document.getElementById("reloadButton");
     const exportPngButton = document.getElementById("exportPngButton");
     const exportXlsButton = document.getElementById("exportXlsButton");
-    const csvFile = document.getElementById("csvFile");
 
     const state = {
       rows: [],
@@ -748,23 +755,8 @@
       academicStartYear: currentAcademicStartYear()
     };
 
-    sourceLink.href = CSV_URL;
-
-    reloadButton.addEventListener("click", () => loadRemoteData());
     exportPngButton.addEventListener("click", () => exportElementToPng(app, "m1-cen-emploi-du-temps.png"));
     exportXlsButton.addEventListener("click", () => exportWorkbook());
-
-    csvFile.addEventListener("change", async event => {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-      try {
-        setStatus(`Chargement du fichier local : ${file.name}…`);
-        const text = await file.text();
-        renderRows(csvToRows(text), `fichier local « ${file.name} »`);
-      } catch (error) {
-        showError("Impossible de lire le CSV local.", error);
-      }
-    });
 
     app.addEventListener("click", event => {
       const sortButton = event.target.closest("[data-sort-key]");
@@ -818,7 +810,7 @@
           const rows = await loadViaGviz();
           renderRows(rows, "API de visualisation Google");
         } catch (gvizError) {
-          showError("Aucune donnée n’a pu être chargée automatiquement. Utilisez le bouton « Charger CSV local ».", gvizError);
+          showError("Aucune donnée n’a pu être chargée automatiquement. Vérifiez votre connexion puis actualisez la page.", gvizError);
         }
       }
     }
@@ -1093,14 +1085,14 @@
               <button class="button small" type="button" data-export-png="${id}" data-export-name="m1-cen-${slugify(semesterTitle)}.png">Exporter ce semestre en PNG</button>
             </div>
           </div>
-          <div class="block-title">Calendrier hebdomadaire <span class="count">${weeklyRows.length} ligne(s)</span></div>
+          <div class="block-title">Calendrier hebdomadaire</div>
           ${renderWeeklyCalendar(weeklyRows)}
-          <div class="block-title">Semaines intensives <span class="count">${intensiveRows.length} ligne(s)</span></div>
+          <div class="block-title">Semaines intensives</div>
           ${renderSimpleRows(intensiveRows, "Aucune semaine intensive renseignée pour ce semestre.", "intensives", semester, true)}
           ${SPECIAL_DAY_TYPES.map(type => {
             const specialRows = rows.filter(row => specialDayType(row) === type.key);
             return `
-              <div class="block-title">${escapeHtml(type.label)} <span class="count">${specialRows.length} ligne(s)</span></div>
+              <div class="block-title">${escapeHtml(type.label)}</div>
               ${renderSimpleRows(specialRows, type.empty, "special-table", semester, type.key === "jours_feries")}
             `;
           }).join("")}
@@ -1309,10 +1301,6 @@
           <div class="section-heading">
             <div>
               <h2>Liste des EC</h2>
-              <p>Version HTML du CSV : EC, code, enseignant(s) et volume horaire, hors lignes « jours fériés » et « date de rentrée ». Cliquez sur un en-tête pour trier.</p>
-            </div>
-            <div class="section-actions no-export">
-              <button class="button small" type="button" data-export-png="ec-directory" data-export-name="m1-cen-liste-ec.png">Exporter la liste en PNG</button>
             </div>
           </div>
           <div class="hours-panel" id="hoursPanel">
@@ -2068,8 +2056,7 @@
     }
 
     function setLoadedStatus(extra = "") {
-      const suffix = extra ? ` ${escapeHtml(extra)}` : "";
-      setStatus(`<strong>${state.rows.length}</strong> ligne(s) chargée(s) depuis ${escapeHtml(state.sourceLabel)}.${suffix}`, "");
+      setStatus(extra ? escapeHtml(extra) : "", "");
     }
 
     function setStatus(message, type = "") {
