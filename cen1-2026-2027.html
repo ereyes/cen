@@ -685,7 +685,7 @@
         <p class="status" id="status">Initialisation…</p>
         <div class="controls no-export">
           <button class="button" type="button" id="exportPngButton" disabled>Exporter PNG</button>
-          <button class="button" type="button" id="exportXlsButton" disabled>Exporter XLS</button>
+          <button class="button" type="button" id="exportXlsButton" disabled>Exporter Excel (.xlsx)</button>
         </div>
       </div>
     </header>
@@ -1939,102 +1939,304 @@
 
     function exportWorkbook() {
       if (!state.rows.length) return;
-      const xml = buildExcelXml();
-      const blob = new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "m1-cen-emploi-du-temps.xls";
-      link.click();
-      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-      setLoadedStatus("Export XLS généré.");
+      exportXlsButton.disabled = true;
+      try {
+        const blob = new Blob([buildExcelWorkbook()], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "m1-cen-emploi-du-temps.xlsx";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        setLoadedStatus("Export Excel généré.");
+      } catch (error) {
+        console.error(error);
+        setStatus(`Impossible de générer le fichier Excel. ${escapeHtml(error.message || error)}`, "error");
+      } finally {
+        exportXlsButton.disabled = !state.rows.length;
+      }
     }
 
-    function buildExcelXml() {
-      const worksheets = [];
-      const entryRows = state.rows.filter(row => headerDayType(row) === "date_rentree").slice().sort(compareRowsByDateThenSource);
-      if (entryRows.length) {
-        worksheets.push(worksheetXml("Dates de rentrée", ["Semestre", "Commentaire", "EC", "Code", "Enseignant"], entryRows.map(row => [
-          formatSemester(row.semestre),
-          row.commentaire,
-          row.ec,
-          row.code,
-          row.enseignant
-        ])));
-      }
-
-      for (const semester of state.semesters) {
-        const semesterRows = state.rows.filter(row => (clean(row.semestre) || "non_renseigne") === semester && !headerDayType(row));
-        const weeklyRows = semesterRows.filter(row => !specialDayType(row) && !isIntensive(row));
-        const intensiveRows = semesterRows.filter(row => isIntensive(row));
-
-        worksheets.push(worksheetXml(`${shortSemesterName(semester)} calendrier`, ["Semestre", "Créneau", "Jour", "EC", "Code", "Enseignant", "Salle", "vh", "UE", "Commentaire"], weeklyRows.slice().sort(sortCourses).map(row => [
-          formatSemester(row.semestre),
-          `${formatTime(row.heure_debut)} – ${formatTime(row.heure_fin)}`,
-          JOUR_LABELS[normalizeDay(row.jour)] || row.jour,
-          row.ec,
-          row.code,
-          row.enseignant,
-          row.salle,
-          hoursForRow(row) || row.nb_heures,
-          row.ue,
-          row.commentaire
-        ])));
-
-        worksheets.push(worksheetXml(`${shortSemesterName(semester)} intensives`, ["Commentaire", "EC", "Code", "Enseignant", "vh", "UE"], simpleRowsForWorksheet(intensiveRows, semester).map(row => [
-          row.commentaire || "Sans commentaire", row.ec, row.code, row.enseignant, hoursForRow(row) || row.nb_heures, row.ue
-        ])));
-
-        for (const type of SPECIAL_DAY_TYPES) {
-          const specialRows = semesterRows.filter(row => specialDayType(row) === type.key);
-          worksheets.push(worksheetXml(`${shortSemesterName(semester)} ${type.label}`, ["Commentaire", "EC", "Code", "Enseignant", "vh", "UE"], simpleRowsForWorksheet(specialRows, semester).map(row => [
-            row.commentaire || "Sans commentaire", row.ec, row.code, row.enseignant, hoursForRow(row) || row.nb_heures, row.ue
-          ])));
-        }
-      }
-
-      worksheets.push(worksheetXml("Liste EC", ["Semestre", "EC", "Code", "Enseignant(s)", "vh", "#"], getSortedEcRows().map(row => [
-        formatSemester(row.semestre),
-        row.ec,
-        row.code,
-        row.enseignants.join(" ; "),
-        row.nb_heures,
+    // Native XLSX package, generated locally without an additional download/library.
+    // The layout uses the same grouping, ordering, time slots and UE colours as the page.
+    function buildExcelWorkbook() {
+      const sheets = state.semesters.map(buildExcelSemester);
+      const ecRows = getSortedEcRows();
+      const directory = excelTableSheet("Liste EC", ["Semestre", "EC", "Code", "Enseignant(s)", "vh", "Compté"], ecRows.map(row => [
+        formatSemester(row.semestre), row.ec, row.code, row.enseignants.join("\n"), row.nb_heures,
         state.selectedEcIds.has(row.id) ? "oui" : "non"
-      ])));
+      ]), [120, 360, 125, 270, 90, 90]);
+      const totalRow = ecRows.length + 4;
+      excelBlock(directory, totalRow, 0, 1, 4, "Volume horaire sélectionné", { bold: true });
+      excelBlock(directory, totalRow, 4, 1, 1, { formula: `SUMIF(F4:F${Math.max(4, ecRows.length + 3)},"oui",E4:E${Math.max(4, ecRows.length + 3)})`, result: selectedHoursTotal() }, { bold: true, number: true });
+      sheets.push(directory);
+      const entryRows = state.rows.filter(row => headerDayType(row) === "date_rentree").slice().sort(compareRowsByDateThenSource);
+      if (entryRows.length) sheets.push(excelTableSheet("Dates de rentrée", ["Semestre", "Commentaire", "EC", "Code", "Enseignant"], entryRows.map(row => [formatSemester(row.semestre), row.commentaire, row.ec, row.code, row.enseignant]), [120, 470, 310, 125, 220]));
+      sheets.push(excelTableSheet("CSV brut", REQUIRED_COLUMNS, state.rows.map(row => REQUIRED_COLUMNS.map(column => row[column])), REQUIRED_COLUMNS.map(column => column === "ec" || column === "commentaire" ? 350 : column === "enseignant" ? 220 : 120)));
 
-      worksheets.push(worksheetXml("CSV brut", REQUIRED_COLUMNS, state.rows.map(row => REQUIRED_COLUMNS.map(column => row[column]))));
-
-      return `<?xml version="1.0" encoding="UTF-8"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
-  xmlns:o="urn:schemas-microsoft-com:office:office"
-  xmlns:x="urn:schemas-microsoft-com:office:excel"
-  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
-  xmlns:html="http://www.w3.org/TR/REC-html40">
-  <Styles>
-    <Style ss:ID="Header"><Font ss:Bold="1"/><Interior ss:Color="#E9F0F8" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/></Borders></Style>
-    <Style ss:ID="Text"><Alignment ss:Vertical="Top" ss:WrapText="1"/></Style>
-    <Style ss:ID="Number"><NumberFormat ss:Format="0.##"/><Alignment ss:Vertical="Top"/></Style>
-  </Styles>
-  ${worksheets.join("\n")}
-</Workbook>`;
+      const names = new Set();
+      sheets.forEach(sheet => {
+        const base = safeWorksheetName(sheet.name);
+        let name = base, suffix = 1;
+        while (names.has(name.toLowerCase())) { const tail = ` (${++suffix})`; name = base.slice(0, 31 - tail.length) + tail; }
+        names.add(name.toLowerCase()); sheet.name = name;
+      });
+      const styles = excelStyleRegistry();
+      const sheetXml = sheets.map(sheet => excelSheetXml(sheet, styles));
+      const ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+      const rel = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+      const declaration = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+      const files = [
+        ["[Content_Types].xml", `${declaration}<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")}</Types>`],
+        ["_rels/.rels", `${declaration}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${rel}/officeDocument" Target="xl/workbook.xml"/></Relationships>`],
+        ["xl/workbook.xml", `${declaration}<workbook xmlns="${ns}" xmlns:r="${rel}"><bookViews><workbookView activeTab="0"/></bookViews><sheets>${sheets.map((sheet, i) => `<sheet name="${xmlEscape(sheet.name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("")}</sheets><definedNames>${sheets.map((sheet, i) => `<definedName name="_xlnm.Print_Area" localSheetId="${i}">'${xmlEscape(sheet.name.replace(/'/g, "''"))}'!$A$1:$${excelColumn(sheet.widths.length - 1)}$${sheet.lastRow + 1}</definedName>`).join("")}</definedNames><calcPr calcId="191029" fullCalcOnLoad="1"/></workbook>`],
+        ["xl/_rels/workbook.xml.rels", `${declaration}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="${rel}/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join("")}<Relationship Id="rId${sheets.length + 1}" Type="${rel}/styles" Target="styles.xml"/></Relationships>`],
+        ["xl/styles.xml", styles.xml()],
+        ...sheetXml.map((xml, i) => [`xl/worksheets/sheet${i + 1}.xml`, xml])
+      ];
+      return excelZip(files);
     }
 
-    function simpleRowsForWorksheet(rows, semester) {
-      return groupRowsByComment(rows, semester, true).flatMap(group => group.rows.slice().sort(sortCourses));
+    function excelSheet(name, widths) {
+      return { name, widths, cells: new Map(), merges: [], heights: new Map(), lastRow: 0, freeze: 0 };
     }
 
-    function worksheetXml(name, headers, rows) {
-      const safeName = xmlEscape(safeWorksheetName(name));
-      const headerRow = `<Row>${headers.map(header => `<Cell ss:StyleID="Header"><Data ss:Type="String">${xmlEscape(header)}</Data></Cell>`).join("")}</Row>`;
-      const bodyRows = rows.map(row => `<Row>${row.map(value => cellXml(value)).join("")}</Row>`).join("\n");
-      return `<Worksheet ss:Name="${safeName}"><Table>${headerRow}${bodyRows}</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><FreezePanes/><FrozenNoSplit/><SplitHorizontal>1</SplitHorizontal><TopRowBottomPane>1</TopRowBottomPane></WorksheetOptions></Worksheet>`;
+    function excelColumn(index) {
+      let label = "";
+      for (let n = index + 1; n; n = Math.floor((n - 1) / 26)) label = String.fromCharCode(65 + (n - 1) % 26) + label;
+      return label;
     }
 
-    function cellXml(value) {
-      if (typeof value === "number" && Number.isFinite(value)) return `<Cell ss:StyleID="Number"><Data ss:Type="Number">${value}</Data></Cell>`;
-      const parsed = parseHours(value);
-      if (Number.isFinite(parsed) && String(value).trim().match(/^[\d,.\s]+h?$/i)) return `<Cell ss:StyleID="Number"><Data ss:Type="Number">${parsed}</Data></Cell>`;
-      return `<Cell ss:StyleID="Text"><Data ss:Type="String">${xmlEscape(value ?? "")}</Data></Cell>`;
+    function excelAddress(row, col) { return `${excelColumn(col)}${row + 1}`; }
+
+    function excelBlock(sheet, row, col, height, width, value, format = {}) {
+      if (height < 1 || width < 1) return;
+      sheet.lastRow = Math.max(sheet.lastRow, row + height - 1);
+      for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+        const address = excelAddress(row + y, col + x);
+        if (sheet.cells.has(address)) throw new Error(`Cellules superposées : ${sheet.name} ${address}`);
+        const edge = format.border ? { top: y === 0, bottom: y === height - 1, left: x === 0, right: x === width - 1 } : {};
+        sheet.cells.set(address, { row: row + y, col: col + x, value: x === 0 && y === 0 ? value : null, format: { ...format, ...edge } });
+      }
+      if (height > 1 || width > 1) sheet.merges.push(`${excelAddress(row, col)}:${excelAddress(row + height - 1, col + width - 1)}`);
+    }
+
+    function excelTextHeight(value, width, minimum = 1) {
+      const text = Array.isArray(value) ? value.map(run => run.text).join("") : String(value ?? "");
+      const chars = Math.max(8, Math.floor((width - 28) / 7));
+      const lines = text.split("\n").reduce((sum, line) => sum + Math.max(1, Math.ceil(line.length / chars)), 0);
+      return Math.max(minimum, lines + 1);
+    }
+
+    function excelCourseText(row, simple = false) {
+      const lines = [{ text: row.ec || "EC non renseigné", bold: true }];
+      for (const text of [row.code, row.enseignant].filter(Boolean)) lines.push({ text: `\n${text}`, color: "5F6B7A" });
+      if (!simple) {
+        const room = [row.salle ? `Salle : ${row.salle}` : "", row.nb_heures ? `${row.nb_heures} h` : ""].filter(Boolean).join(" · ");
+        if (room) lines.push({ text: `\n${room}`, color: "5F6B7A" });
+        if (row.commentaire) lines.push({ text: `\n\n${row.commentaire}`, color: "364152" });
+      }
+      return lines;
+    }
+
+    function buildExcelSemester(semester) {
+      const rows = state.rows.filter(row => (clean(row.semestre) || "non_renseigne") === semester && !headerDayType(row));
+      const weekly = rows.filter(row => !specialDayType(row) && !isIntensive(row));
+      const valid = weekly.filter(row => JOURS.includes(normalizeDay(row.jour)) && Number.isFinite(timeToMinutes(row.heure_debut)) && Number.isFinite(timeToMinutes(row.heure_fin)));
+      const slots = uniqueSlots(valid), buckets = new Map();
+      valid.forEach(row => {
+        if (isFullDaySlot(slotFor(row))) return;
+        const key = `${slotFor(row).key}__${normalizeDay(row.jour)}`;
+        if (!buckets.has(key)) buckets.set(key, []);
+        buckets.get(key).push(row);
+      });
+      const spans = buildFullDaySpanPlans(valid, slots);
+      const model = buildCalendarColumnModel(valid, slots, buckets, spans);
+      // Twelve physical columns per day allow 1, 2, 3 or 4 adjacent course cards.
+      const sheet = excelSheet(formatSemester(semester), [132, ...JOURS.flatMap(day => Array(12).fill(model.dayWidths[day]))]);
+      const count = sheet.widths.length;
+      const headerStyle = { bold: true, fill: "E9F0F8", align: "center", vertical: "center", border: true };
+      sheet.heights.set(0, 30);
+      excelBlock(sheet, 0, 0, 1, count, formatSemester(semester), { bold: true, size: 18 });
+      sheet.heights.set(2, 26);
+      excelBlock(sheet, 2, 0, 1, count, "Calendrier hebdomadaire", { bold: true, size: 13 });
+      let cursor = 3;
+      if (!valid.length) {
+        excelBlock(sheet, cursor, 0, 2, count, "Aucun cours hebdomadaire renseigné pour ce semestre.", { fill: "F9FAFC", color: "5F6B7A", vertical: "center" });
+        cursor += 2;
+      } else {
+        sheet.heights.set(cursor, 28);
+        excelBlock(sheet, cursor, 0, 1, 1, "Créneau", headerStyle);
+        JOURS.forEach((day, i) => excelBlock(sheet, cursor, 1 + i * 12, 1, 12, JOUR_LABELS[day], headerStyle));
+        cursor++;
+        const units = slots.map(slot => Math.max(8, ...JOURS.map(day => (buckets.get(`${slot.key}__${day}`) || []).reduce((sum, row) => sum + excelTextHeight(excelCourseText(row), model.dayWidths[day] * 12, 8), 0))));
+        for (const day of JOURS) {
+          const plan = spans[day];
+          if (!plan) continue;
+          const first = slots.findIndex(slot => slot.key === plan.startKey);
+          const lanes = Math.min(plan.rows.length, 4);
+          const required = Array.from({ length: Math.ceil(plan.rows.length / lanes) }, (_, band) => Math.max(...plan.rows.slice(band * lanes, (band + 1) * lanes).map(row => excelTextHeight(excelCourseText(row), model.dayWidths[day] * 12 / lanes, 8)))).reduce((a, b) => a + b, 0);
+          const available = units.slice(first, first + plan.spanCount).reduce((a, b) => a + b, 0);
+          if (required > available) units[first + plan.spanCount - 1] += required - available;
+        }
+        const starts = units.map((_, i) => cursor + units.slice(0, i).reduce((a, b) => a + b, 0));
+        slots.forEach((slot, index) => {
+          const start = starts[index], height = units[index];
+          excelBlock(sheet, start, 0, height, 1, `${slot.startLabel}\n–\n${slot.endLabel}`, { bold: true, fill: "F9FAFC", align: "center", vertical: "center", border: true });
+          JOURS.forEach((day, dayIndex) => {
+            const col = 1 + dayIndex * 12, plan = spans[day];
+            if (plan && plan.skipKeys.has(slot.key)) return;
+            const full = plan && plan.startKey === slot.key;
+            const courses = (full ? plan.rows : buckets.get(`${slot.key}__${day}`) || []).slice().sort(sortCourses);
+            const available = full ? units.slice(index, index + plan.spanCount).reduce((a, b) => a + b, 0) : height;
+            if (!courses.length) {
+              excelBlock(sheet, start, col, available, 12, "—", { fill: "FBFCFE", color: "AAB4C2", align: "center", vertical: "center", border: true });
+              return;
+            }
+            const lanes = full ? Math.min(courses.length, 4) : 1;
+            const bandCount = Math.ceil(courses.length / lanes);
+            const bandSizes = Array.from({ length: bandCount }, (_, band) => Math.max(...courses.slice(band * lanes, (band + 1) * lanes).map(row => excelTextHeight(excelCourseText(row), model.dayWidths[day] * 12 / lanes, 8))));
+            if (full) {
+              const extra = available - bandSizes.reduce((a, b) => a + b, 0);
+              bandSizes.forEach((size, i) => { bandSizes[i] = size + Math.floor(extra / bandCount) + (i < extra % bandCount ? 1 : 0); });
+            }
+            let offset = 0;
+            for (let band = 0; band < bandCount; band++) {
+              const group = courses.slice(band * lanes, (band + 1) * lanes);
+              const size = bandSizes[band];
+              for (let lane = 0; lane < lanes; lane++) {
+                const row = group[lane];
+                excelBlock(sheet, start + offset, col + lane * 12 / lanes, size, 12 / lanes, row ? excelCourseText(row) : "", { border: true, leftColor: row ? excelUeColor(row.ue) : undefined, indent: 1 });
+              }
+              offset += size;
+            }
+            if (offset < available) excelBlock(sheet, start + offset, col, available - offset, 12, "", { border: true });
+          });
+        });
+        cursor += units.reduce((a, b) => a + b, 0);
+      }
+      const sections = [
+        { label: "Semaines intensives", rows: rows.filter(isIntensive), empty: "Aucune semaine intensive renseignée pour ce semestre.", sort: true },
+        ...SPECIAL_DAY_TYPES.map(type => ({ label: type.label, rows: rows.filter(row => specialDayType(row) === type.key), empty: type.empty, sort: type.key === "jours_feries" }))
+      ];
+      // Choose a real column boundary nearest the HTML comment column's 36% width.
+      const totalWidth = sheet.widths.reduce((a, b) => a + b, 0);
+      let split = 1, splitWidth = sheet.widths[0];
+      while (split < count - 1 && splitWidth < totalWidth * .36) splitWidth += sheet.widths[split++];
+      sections.forEach(section => {
+        cursor++;
+        sheet.heights.set(cursor, 28);
+        excelBlock(sheet, cursor++, 0, 1, count, section.label, { bold: true, size: 13 });
+        if (!section.rows.length) {
+          excelBlock(sheet, cursor, 0, 2, count, section.empty, { fill: "F9FAFC", color: "5F6B7A", vertical: "center", indent: 1 });
+          cursor += 2; return;
+        }
+        sheet.heights.set(cursor, 28);
+        excelBlock(sheet, cursor, 0, 1, split, "Commentaire", headerStyle);
+        excelBlock(sheet, cursor++, split, 1, count - split, "EC / code / enseignant", headerStyle);
+        groupRowsByComment(section.rows, semester, section.sort).forEach(group => {
+          const courses = group.rows.slice().sort(sortCourses);
+          const heights = courses.map(row => excelTextHeight(excelCourseText(row, true), totalWidth - splitWidth, 3));
+          const minimum = excelTextHeight(group.comment, splitWidth, 2);
+          const height = Math.max(minimum, heights.reduce((a, b) => a + b, 0));
+          heights[heights.length - 1] += height - heights.reduce((a, b) => a + b, 0);
+          excelBlock(sheet, cursor, 0, height, split, group.comment, { bold: true, border: true, indent: 1, color: "364152" });
+          courses.forEach((row, i) => {
+            excelBlock(sheet, cursor, split, heights[i], count - split, excelCourseText(row, true), { border: true, leftColor: excelUeColor(row.ue), indent: 1 });
+            cursor += heights[i];
+          });
+        });
+      });
+      return sheet;
+    }
+
+    function excelTableSheet(name, headers, rows, widths) {
+      const sheet = excelSheet(name, widths);
+      sheet.freeze = 3;
+      sheet.heights.set(0, 30);
+      excelBlock(sheet, 0, 0, 1, headers.length, name, { bold: true, size: 18 });
+      headers.forEach((label, col) => excelBlock(sheet, 2, col, 1, 1, label, { bold: true, fill: "E9F0F8", vertical: "center", border: true }));
+      sheet.heights.set(2, 26);
+      rows.forEach((row, index) => {
+        const height = Math.max(24, ...row.map((value, col) => excelTextHeight(value, widths[col]) * 15));
+        sheet.heights.set(index + 3, Math.min(409, height));
+        row.forEach((value, col) => excelBlock(sheet, index + 3, col, 1, 1, value, { fill: index % 2 ? "F9FAFC" : "FFFFFF", number: typeof value === "number", border: true }));
+      });
+      return sheet;
+    }
+
+    function excelUeColor(ue) {
+      const value = colorForUe(ue);
+      return /^#[\da-f]{6}$/i.test(value) ? value.slice(1) : "8B96A6";
+    }
+
+    function excelStyleRegistry() {
+      const fonts = [], fills = ['<fill><patternFill patternType="none"/></fill>', '<fill><patternFill patternType="gray125"/></fill>'], borders = [], formats = [];
+      const register = (list, xml) => { let i = list.indexOf(xml); if (i < 0) { i = list.length; list.push(xml); } return i; };
+      const color = value => {
+        const hex = String(value || "1F2933").replace("#", "").toUpperCase();
+        return `FF${/^[\dA-F]{6}$/.test(hex) ? hex : "1F2933"}`;
+      };
+      const id = (format = {}) => {
+        const fontId = register(fonts, `<font><sz val="${format.size || 10}"/><color rgb="${color(format.color)}"/><name val="Arial"/>${format.bold ? "<b/>" : ""}</font>`);
+        const fillId = format.fill ? register(fills, `<fill><patternFill patternType="solid"><fgColor rgb="${color(format.fill)}"/><bgColor indexed="64"/></patternFill></fill>`) : 0;
+        const borderId = register(borders, `<border>${["left", "right", "top", "bottom"].map(edge => format[edge] ? `<${edge} style="${edge === "left" && format.leftColor ? "medium" : "thin"}"><color rgb="${color(edge === "left" && format.leftColor || "D9DEE7")}"/></${edge}>` : `<${edge}/>`).join("")}<diagonal/></border>`);
+        return register(formats, `<xf numFmtId="${format.number ? 164 : 0}" fontId="${fontId}" fillId="${fillId}" borderId="${borderId}" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"${format.number ? ' applyNumberFormat="1"' : ""}><alignment horizontal="${format.align || (format.number ? "right" : "left")}" vertical="${format.vertical || "top"}" wrapText="1"${format.indent ? ` indent="${format.indent}"` : ""}/></xf>`);
+      };
+      id();
+      return { id, xml: () => `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="0.##"/></numFmts><fonts count="${fonts.length}">${fonts.join("")}</fonts><fills count="${fills.length}">${fills.join("")}</fills><borders count="${borders.length}">${borders.join("")}</borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="${formats.length}">${formats.join("")}</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/></styleSheet>` };
+    }
+
+    function excelCellXml(cell, styles) {
+      const attributes = `r="${excelAddress(cell.row, cell.col)}" s="${styles.id(cell.format)}"`;
+      const value = cell.value;
+      if (value === null || value === undefined || value === "") return `<c ${attributes}/>`;
+      if (typeof value === "number" && Number.isFinite(value)) return `<c ${attributes}><v>${value}</v></c>`;
+      if (value.formula) return `<c ${attributes}><f>${xmlEscape(value.formula)}</f><v>${Number.isFinite(value.result) ? value.result : 0}</v></c>`;
+      const text = Array.isArray(value) ? value.map(run => `<r><rPr><rFont val="Arial"/><sz val="10"/>${run.bold ? "<b/>" : ""}<color rgb="FF${run.color || "1F2933"}"/></rPr><t xml:space="preserve">${xmlEscape(run.text)}</t></r>`).join("") : `<t xml:space="preserve">${xmlEscape(value)}</t>`;
+      return `<c ${attributes} t="inlineStr"><is>${text}</is></c>`;
+    }
+
+    function excelSheetXml(sheet, styles) {
+      const rows = new Map();
+      for (const cell of sheet.cells.values()) {
+        if (!rows.has(cell.row)) rows.set(cell.row, []);
+        rows.get(cell.row).push(cell);
+      }
+      const rowXml = Array.from({ length: sheet.lastRow + 1 }, (_, index) => `<row r="${index + 1}" ht="${sheet.heights.get(index) || 15}" customHeight="1">${(rows.get(index) || []).sort((a, b) => a.col - b.col).map(cell => excelCellXml(cell, styles)).join("")}</row>`).join("");
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><dimension ref="A1:${excelAddress(sheet.lastRow, sheet.widths.length - 1)}"/><sheetViews><sheetView showGridLines="0" zoomScale="85" workbookViewId="0">${sheet.freeze ? `<pane ySplit="${sheet.freeze}" topLeftCell="A${sheet.freeze + 1}" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="A${sheet.freeze + 1}" sqref="A${sheet.freeze + 1}"/>` : '<selection activeCell="A1" sqref="A1"/>'}</sheetView></sheetViews><sheetFormatPr defaultRowHeight="15"/><cols>${sheet.widths.map((width, index) => `<col min="${index + 1}" max="${index + 1}" width="${Math.round((width / 7) * 256) / 256}" customWidth="1"/>`).join("")}</cols><sheetData>${rowXml}</sheetData>${sheet.merges.length ? `<mergeCells count="${sheet.merges.length}">${sheet.merges.map(ref => `<mergeCell ref="${ref}"/>`).join("")}</mergeCells>` : ""}<pageMargins left="0.3" right="0.3" top="0.35" bottom="0.35" header="0.15" footer="0.15"/><pageSetup paperSize="8" orientation="portrait" fitToWidth="1" fitToHeight="0"/></worksheet>`;
+    }
+
+    // ZIP's uncompressed mode avoids any extra library in the standalone page.
+    function excelZip(files) {
+      const encoder = new TextEncoder(), local = [], central = [];
+      const crcTable = Array.from({ length: 256 }, (_, n) => {
+        for (let bit = 0; bit < 8; bit++) n = (n >>> 1) ^ (n & 1 ? 0xEDB88320 : 0);
+        return n >>> 0;
+      });
+      const crc32 = bytes => { let crc = 0xFFFFFFFF; for (const byte of bytes) crc = (crc >>> 8) ^ crcTable[(crc ^ byte) & 255]; return (crc ^ 0xFFFFFFFF) >>> 0; };
+      const record = size => { const bytes = new Uint8Array(size); return { bytes, view: new DataView(bytes.buffer) }; };
+      let offset = 0;
+      files.forEach(([path, xml]) => {
+        const name = encoder.encode(path), data = encoder.encode(xml), crc = crc32(data);
+        const header = record(30 + name.length), h = header.view;
+        h.setUint32(0, 0x04034B50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(12, 33, true);
+        h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, name.length, true);
+        header.bytes.set(name, 30); local.push(header.bytes, data);
+        const directory = record(46 + name.length), d = directory.view;
+        d.setUint32(0, 0x02014B50, true); d.setUint16(4, 20, true); d.setUint16(6, 20, true); d.setUint16(8, 0x0800, true); d.setUint16(14, 33, true);
+        d.setUint32(16, crc, true); d.setUint32(20, data.length, true); d.setUint32(24, data.length, true); d.setUint16(28, name.length, true); d.setUint32(42, offset, true);
+        directory.bytes.set(name, 46); central.push(directory.bytes); offset += header.bytes.length + data.length;
+      });
+      const directorySize = central.reduce((sum, part) => sum + part.length, 0), end = record(22);
+      end.view.setUint32(0, 0x06054B50, true); end.view.setUint16(8, files.length, true); end.view.setUint16(10, files.length, true);
+      end.view.setUint32(12, directorySize, true); end.view.setUint32(16, offset, true);
+      const output = new Uint8Array(offset + directorySize + end.bytes.length);
+      let cursor = 0;
+      for (const part of [...local, ...central, end.bytes]) { output.set(part, cursor); cursor += part.length; }
+      return output;
     }
 
     function safeWorksheetName(name) {
@@ -2098,7 +2300,8 @@
     }
 
     function xmlEscape(value) {
-      return escapeHtml(value).replace(/\u000b/g, " ");
+      // XML 1.0 rejects control characters even inside escaped text.
+      return escapeHtml(String(value ?? "").replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\ufffe\uffff]/g, " "));
     }
   </script>
 </body>
