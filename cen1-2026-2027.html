@@ -1,12 +1,12 @@
-<!doctype html>
-<html lang="fr">
-<head>
+<!DOCTYPE html>
+<html lang="fr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Emploi du temps — M1 Création et expérience numériques</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #f6f7f9;
@@ -23,6 +23,7 @@
       --shadow: 0 12px 30px rgba(31, 41, 51, .08);
       --ue-neutral: #8b96a6;
       --slot-min-height: clamp(92px, 10.5vw, 148px);
+      --day-cell-padding: clamp(2px, .5vw, 7px);
     }
 
     * { box-sizing: border-box; min-width: 0; }
@@ -336,7 +337,7 @@
 
     .day-cell {
       height: var(--slot-min-height);
-      padding: clamp(2px, .5vw, 7px);
+      padding: var(--day-cell-padding);
       background: #fff;
     }
 
@@ -365,7 +366,8 @@
       display: flex;
       flex-direction: column;
       gap: clamp(1px, .35vw, 4px);
-      min-height: 100%;
+      /* A length, not 100% of the cell: stacked cards must grow the row. */
+      min-height: calc(var(--slot-min-height) - var(--day-cell-padding) - var(--day-cell-padding) - 1px);
       padding: clamp(3px, .7vw, 9px);
       border-top: 1px solid var(--line-soft);
       border-right: 1px solid var(--line-soft);
@@ -650,7 +652,7 @@
     }
 
     @media (max-width: 430px) {
-      :root { --slot-min-height: 104px; }
+      :root { --slot-min-height: 104px; --day-cell-padding: 2px; }
       .page { width: calc(100% - 8px); }
       header,
       .semester,
@@ -670,27 +672,732 @@
     }
   </style>
 </head>
-<body>
+<body cz-shortcut-listen="true">
   <div class="page">
     <header>
       <p class="eyebrow">M1 Création et expérience numériques</p>
       <h1>EDT <span style="color:tomato">CEN 1</span> - sem. 1 et 2</h1>
-      <div class="start-dates" id="startDates" hidden></div>
+      <div class="start-dates" id="startDates">
+        <p class="start-dates-title">Date de rentrée</p>
+        <div class="start-dates-list">
+          <div>Lundi 14 septembre 2026. 10h-12h : réntrée commune à tous les parcours HN. Salle D.003 14h-16h : réunion parcours CEN. Salle B104</div>
+        </div>
+      </div>
       <nav class="jump-menu" aria-label="Navigation interne">
         <a href="#semester-1">Semestre 1</a>
         <a href="#semester-2">Semestre 2</a>
         <a href="#ec-directory">Liste des EC</a>
       </nav>
       <div class="status-row">
-        <p class="status" id="status">Initialisation…</p>
+        <p class="status" id="status"></p>
         <div class="controls no-export">
-          <button class="button" type="button" id="exportPngButton" disabled>Exporter PNG</button>
-          <button class="button" type="button" id="exportXlsButton" disabled>Exporter Excel (.xlsx)</button>
+          <button class="button" type="button" id="exportPngButton">Exporter PNG</button>
+          <button class="button" type="button" id="exportXlsButton">Exporter Excel (.xlsx)</button>
         </div>
       </div>
     </header>
 
-    <main id="app" aria-live="polite"></main>
+    <main id="app" aria-live="polite">
+        
+        <section class="semester" id="semester-1">
+          <div class="semester-heading">
+            <h2>Semestre 1</h2>
+            <div class="semester-actions no-export">
+              <button class="button small" type="button" data-export-png="semester-1" data-export-name="m1-cen-semestre-1.png">Exporter ce semestre en PNG</button>
+            </div>
+          </div>
+          <div class="block-title">Calendrier hebdomadaire</div>
+          
+        <div class="table-wrap calendar-wrap">
+          <table class="calendar">
+            <colgroup>
+              <col class="slot-col" style="width:11%">
+              <col class="day-col" style="width:24.33%"><col class="day-col" style="width:24.33%"><col class="day-col" style="width:24.33%"><col class="day-col-empty" style="width:8%"><col class="day-col-empty" style="width:8%">
+            </colgroup>
+            <thead>
+              <tr>
+                <th class="slot-head"><span class="slot-long">Créneau</span><span class="slot-short">Crén.</span></th>
+                <th class=""><span class="day-label day-long">Lundi</span><span class="day-label day-short">Lun.</span></th><th class=""><span class="day-label day-long">Mardi</span><span class="day-label day-short">Mar.</span></th><th class=""><span class="day-label day-long">Mercredi</span><span class="day-label day-short">Mer.</span></th><th class="day-col-empty"><span class="day-label day-long">Jeudi</span><span class="day-label day-short">Jeu.</span></th><th class="day-col-empty"><span class="day-label day-long">Vendredi</span><span class="day-label day-short">Ven.</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <th class="slot-cell">
+        <span class="slot-label">
+          <span>9h</span>
+          <span class="slot-separator">–</span>
+          <span>12h</span>
+        </span>
+      </th>
+                  <td class="day-cell  ">
+        <article class="course-card" style="--ue-color: #dc2626">
+          <div class="course-title">Narrations interactives</div>
+          <div class="course-meta"><span>DMA1EDA8</span><span>Didier LAURET</span></div>
+          <div class="course-room">Salle : A043 · 30 h</div>
+          <div class="course-comment">Mutualisé avec MCPN (5 places dédiées)</div>
+        </article>
+      </td><td class="day-cell  ">
+        <article class="course-card" style="--ue-color: #16a34a">
+          <div class="course-title">Programmation créative (matin)</div>
+          <div class="course-meta"><span>DMA1EDA3</span><span>Laure LEROY</span></div>
+          <div class="course-room">Salle : B103 · 15 h</div>
+          <div class="course-comment">(les 5 premières semaines)</div>
+        </article>
+      
+        <article class="course-card" style="--ue-color: #16a34a">
+          <div class="course-title">BDDR (Théorie)</div>
+          <div class="course-meta"><span>DMA1EDA4</span><span>Nasreddine BOUHAÏ</span></div>
+          <div class="course-room">Salle : B103 · 15 h</div>
+          <div class="course-comment">(les 5 semaines suivantes)</div>
+        </article>
+      </td><td class="day-cell  ">
+        <article class="course-card" style="--ue-color: #9333ea">
+          <div class="course-title">Editorialisation et stratégie de contenu</div>
+          <div class="course-meta"><span>DMA1EDA8</span><span>Arnaud LABORDERIE</span></div>
+          <div class="course-room">Salle : 0.018 BAT SUD · 30 h</div>
+          
+        </article>
+      </td><td class="day-cell column-empty cell-empty"><div class="empty">—</div></td><td class="day-cell column-empty cell-empty"><div class="empty">—</div></td>
+                </tr>
+              
+                <tr>
+                  <th class="slot-cell">
+        <span class="slot-label">
+          <span>12h</span>
+          <span class="slot-separator">–</span>
+          <span>15h</span>
+        </span>
+      </th>
+                  <td class="day-cell  ">
+        <article class="course-card" style="--ue-color: #0891b2">
+          <div class="course-title">Conception UI</div>
+          <div class="course-meta"><span>DMA1EDA9</span><span>Marie LE ROCH</span></div>
+          <div class="course-room">Salle : A148 · 30 h</div>
+          
+        </article>
+      </td><td class="day-cell  ">
+        <article class="course-card" style="--ue-color: #dc2626">
+          <div class="course-title">Web Graphique</div>
+          <div class="course-meta"><span>DMA1EDA7</span><span>Everardo REYES</span></div>
+          <div class="course-room">Salle : B103 · 30 h</div>
+          <div class="course-comment">Mutualisé MCPN (5 places)</div>
+        </article>
+      </td><td class="day-cell  ">
+        <article class="course-card" style="--ue-color: #9333ea">
+          <div class="course-title">Graphisme et design d'interface</div>
+          <div class="course-meta"><span>DMA1EDAC</span><span>John MOTTA</span></div>
+          <div class="course-room">Salle : 0.018 BAT SUD · 30 h</div>
+          
+        </article>
+      </td><td class="day-cell column-empty cell-empty"><div class="empty">—</div></td><td class="day-cell column-empty cell-empty"><div class="empty">—</div></td>
+                </tr>
+              
+                <tr>
+                  <th class="slot-cell">
+        <span class="slot-label">
+          <span>15h</span>
+          <span class="slot-separator">–</span>
+          <span>18h</span>
+        </span>
+      </th>
+                  <td class="day-cell  ">
+        <article class="course-card" style="--ue-color: #16a34a">
+          <div class="course-title">BDDR (Pratique)</div>
+          <div class="course-meta"><span>DMA1EDA4</span><span>Nasreddine BOUHAÏ</span></div>
+          <div class="course-room">Salle : A148 · 15 h</div>
+          <div class="course-comment">(les 5 premières semaines)</div>
+        </article>
+      </td><td class="day-cell  ">
+        <article class="course-card" style="--ue-color: #16a34a">
+          <div class="course-title">Programmation créative (après-midi)</div>
+          <div class="course-meta"><span>DMA1EDA3</span><span>Samuel DA SILVA</span></div>
+          <div class="course-room">Salle : B103 · 15 h</div>
+          <div class="course-comment">(les 5 dernières semaines)</div>
+        </article>
+      </td><td class="day-cell  ">
+        <article class="course-card" style="--ue-color: #dc2626">
+          <div class="course-title">Atelier image Illustrator-photoshop</div>
+          <div class="course-meta"><span>DMA1EDA5</span><span>John MOTTA</span></div>
+          <div class="course-room">Salle : 0.018 BAT SUD · 30 h</div>
+          <div class="course-comment">Mutualisé MCPN (5 places dédiées)</div>
+        </article>
+      </td><td class="day-cell column-empty cell-empty"><div class="empty">—</div></td><td class="day-cell column-empty cell-empty"><div class="empty">—</div></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      
+          <div class="block-title">Semaines intensives</div>
+          
+        <div class="table-wrap intensives-wrap">
+          <table class="intensives">
+            <colgroup>
+              <col class="comment-col">
+              <col class="ec-col">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Commentaire</th>
+                <th>EC / code / enseignant</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td class="comment-cell">Du 14 au 18 sept. 2026 (mutualisé avec M1 NET)</td>
+                  <td>
+                    <div class="intensive-list">
+                      <div class="intensive-item" style="--ue-color: #2563eb"><strong>Approches transversales des humanités numériques (mardi)</strong><br>DMA1EDA1<br>Samuel DA SILVA</div><div class="intensive-item" style="--ue-color: #2563eb"><strong>Approches transversales des humanités numériques (jeudi)</strong><br>DMA1EDA1<br>Everardo REYES</div>
+                    </div>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td class="comment-cell">Du 7 au 12 déc. 2026 Mutualisé avec MCPN (5 places dédiées)</td>
+                  <td>
+                    <div class="intensive-list">
+                      <div class="intensive-item" style="--ue-color: #dc2626"><strong>Atelier Introduction à la 3D</strong><br>DMA1EDA6<br>Noémie SCHERER</div>
+                    </div>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td class="comment-cell">Du 14 au 18 déc. 2026</td>
+                  <td>
+                    <div class="intensive-list">
+                      <div class="intensive-item" style="--ue-color: #9333ea"><strong>Interaction 3D (Unity)</strong><br>DMA1EDA9<br>Stéphan TWAROG</div><div class="intensive-item" style="--ue-color: #9333ea"><strong>Design d’interfaces interactives</strong><br>DMA1EDAB<br>Rodolphe RICHARD</div>
+                    </div>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td class="comment-cell">Du 4 au 8 janv. 2027 (mutualisé avec M1 GSI et M1 NET)</td>
+                  <td>
+                    <div class="intensive-list">
+                      <div class="intensive-item" style="--ue-color: #2563eb"><strong>Économie et droit du numérique</strong><br>DMA1EDA2<br>Matthieu QUINIOU</div>
+                    </div>
+                  </td>
+                </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      
+          
+              <div class="block-title">Jours fériés</div>
+              
+        <div class="table-wrap intensives-wrap">
+          <table class="special-table">
+            <colgroup>
+              <col class="comment-col">
+              <col class="ec-col">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Commentaire</th>
+                <th>EC / code / enseignant</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td class="comment-cell">26 oct. - 30 oct.</td>
+                  <td>
+                    <div class="intensive-list">
+                      <div class="intensive-item" style="--ue-color: var(--ue-neutral)"><strong>Pause pédagogique</strong></div>
+                    </div>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td class="comment-cell">1 nov.</td>
+                  <td>
+                    <div class="intensive-list">
+                      <div class="intensive-item" style="--ue-color: var(--ue-neutral)"><strong>Toussaint</strong></div>
+                    </div>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td class="comment-cell">11 nov.</td>
+                  <td>
+                    <div class="intensive-list">
+                      <div class="intensive-item" style="--ue-color: var(--ue-neutral)"><strong>Armistice 1918</strong></div>
+                    </div>
+                  </td>
+                </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      
+            
+              <div class="block-title">Stage et suivi de mémoire</div>
+              <p class="notice">Aucune ligne stage / suivi de mémoire renseignée pour ce semestre.</p>
+            
+        </section>
+      
+        <section class="semester" id="semester-2">
+          <div class="semester-heading">
+            <h2>Semestre 2</h2>
+            <div class="semester-actions no-export">
+              <button class="button small" type="button" data-export-png="semester-2" data-export-name="m1-cen-semestre-2.png">Exporter ce semestre en PNG</button>
+            </div>
+          </div>
+          <div class="block-title">Calendrier hebdomadaire</div>
+          
+        <div class="table-wrap calendar-wrap">
+          <table class="calendar">
+            <colgroup>
+              <col class="slot-col" style="width:11%">
+              <col class="day-col-empty" style="width:8%"><col class="day-col-empty" style="width:8%"><col class="day-col-empty" style="width:8%"><col class="day-col" style="width:16.25%"><col class="day-col" style="width:48.75%">
+            </colgroup>
+            <thead>
+              <tr>
+                <th class="slot-head"><span class="slot-long">Créneau</span><span class="slot-short">Crén.</span></th>
+                <th class="day-col-empty"><span class="day-label day-long">Lundi</span><span class="day-label day-short">Lun.</span></th><th class="day-col-empty"><span class="day-label day-long">Mardi</span><span class="day-label day-short">Mar.</span></th><th class="day-col-empty"><span class="day-label day-long">Mercredi</span><span class="day-label day-short">Mer.</span></th><th class=""><span class="day-label day-long">Jeudi</span><span class="day-label day-short">Jeu.</span></th><th class=""><span class="day-label day-long">Vendredi</span><span class="day-label day-short">Ven.</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <th class="slot-cell">
+        <span class="slot-label">
+          <span>9h</span>
+          <span class="slot-separator">–</span>
+          <span>12h</span>
+        </span>
+      </th>
+                  <td class="day-cell column-empty cell-empty"><div class="empty">—</div></td><td class="day-cell column-empty cell-empty"><div class="empty">—</div></td><td class="day-cell column-empty cell-empty"><div class="empty">—</div></td><td class="day-cell  ">
+        <article class="course-card" style="--ue-color: #0891b2">
+          <div class="course-title">Suivi dév et intégration</div>
+          <div class="course-meta"><span>DMA2EDA6</span><span>Samuel DA SILVA</span></div>
+          <div class="course-room">30 h</div>
+          
+        </article>
+      
+        <article class="course-card" style="--ue-color: #0891b2">
+          <div class="course-title">Asp édit réalisation multimédia</div>
+          <div class="course-meta"><span>DMA2EDAA</span><span>Laure LEROY</span></div>
+          <div class="course-room">30 h</div>
+          
+        </article>
+      </td><td class="day-cell full-day-span " rowspan="3" data-span-count="3" style="--span-count: 3"><div class="full-day-fill" style="height: 663px; min-height: 663px;"><div class="course-grid full-day-grid" style="--course-columns: 3">
+        <article class="course-card" style="--ue-color: #ea580c">
+          <div class="course-title">Concep et gest de proj num</div>
+          <div class="course-meta"><span>DMA2EDA2</span><span>Nicolas SAURET</span></div>
+          <div class="course-room">30 h</div>
+          <div class="course-comment">Mutualisé avec MCPN (les 3 premières semaines)</div>
+        </article>
+      
+        <article class="course-card" style="--ue-color: #0891b2">
+          <div class="course-title">Interaction appliquée</div>
+          <div class="course-meta"><span>DMA2EDA5</span><span>Laure LEROY</span></div>
+          <div class="course-room">30 h</div>
+          <div class="course-comment">(les 5 semaines suivantes)</div>
+        </article>
+      
+        <article class="course-card" style="--ue-color: #ea580c">
+          <div class="course-title">After Effects</div>
+          <div class="course-meta"><span>DMA2EDA3</span><span>Stéphan TWAROG</span></div>
+          <div class="course-room">30 h</div>
+          <div class="course-comment">(les 3 dernières semaines)</div>
+        </article>
+      </div></div></td>
+                </tr>
+              
+                <tr>
+                  <th class="slot-cell">
+        <span class="slot-label">
+          <span>12h</span>
+          <span class="slot-separator">–</span>
+          <span>15h</span>
+        </span>
+      </th>
+                  <td class="day-cell column-empty cell-empty"><div class="empty">—</div></td><td class="day-cell column-empty cell-empty"><div class="empty">—</div></td><td class="day-cell column-empty cell-empty"><div class="empty">—</div></td><td class="day-cell  ">
+        <article class="course-card" style="--ue-color: #0891b2">
+          <div class="course-title">Direction artistique</div>
+          <div class="course-meta"><span>DMA2EDA7</span><span>John MOTTA</span></div>
+          <div class="course-room">30 h</div>
+          
+        </article>
+      
+        <article class="course-card" style="--ue-color: #ea580c">
+          <div class="course-title">Immersion et interaction</div>
+          <div class="course-meta"><span>DMA2EDA1</span><span>Laure LEROY</span></div>
+          <div class="course-room">30 h</div>
+          
+        </article>
+      </td>
+                </tr>
+              
+                <tr>
+                  <th class="slot-cell">
+        <span class="slot-label">
+          <span>15h</span>
+          <span class="slot-separator">–</span>
+          <span>18h</span>
+        </span>
+      </th>
+                  <td class="day-cell column-empty cell-empty"><div class="empty">—</div></td><td class="day-cell column-empty cell-empty"><div class="empty">—</div></td><td class="day-cell column-empty cell-empty"><div class="empty">—</div></td><td class="day-cell  ">
+        <article class="course-card" style="--ue-color: #0891b2">
+          <div class="course-title">Animation 2D et vidéo</div>
+          <div class="course-meta"><span>DMA2EDA9</span><span>Laurent LACOMBE</span></div>
+          <div class="course-room">30 h</div>
+          
+        </article>
+      </td>
+                </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      
+          <div class="block-title">Semaines intensives</div>
+          <p class="notice">Aucune semaine intensive renseignée pour ce semestre.</p>
+          
+              <div class="block-title">Jours fériés</div>
+              
+        <div class="table-wrap intensives-wrap">
+          <table class="special-table">
+            <colgroup>
+              <col class="comment-col">
+              <col class="ec-col">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Commentaire</th>
+                <th>EC / code / enseignant</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td class="comment-cell">15 fev. - 19 fev.</td>
+                  <td>
+                    <div class="intensive-list">
+                      <div class="intensive-item" style="--ue-color: var(--ue-neutral)"><strong>Pause pédagogique</strong></div>
+                    </div>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td class="comment-cell">29 mars</td>
+                  <td>
+                    <div class="intensive-list">
+                      <div class="intensive-item" style="--ue-color: var(--ue-neutral)"><strong>Lundi de Pâques</strong></div>
+                    </div>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td class="comment-cell">12 avr. - 16 avr.</td>
+                  <td>
+                    <div class="intensive-list">
+                      <div class="intensive-item" style="--ue-color: var(--ue-neutral)"><strong>Fermeture de l'université</strong></div>
+                    </div>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td class="comment-cell">6 mai</td>
+                  <td>
+                    <div class="intensive-list">
+                      <div class="intensive-item" style="--ue-color: var(--ue-neutral)"><strong>Ascension</strong></div>
+                    </div>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td class="comment-cell">7 mai</td>
+                  <td>
+                    <div class="intensive-list">
+                      <div class="intensive-item" style="--ue-color: var(--ue-neutral)"><strong>Fermeture administrative</strong></div>
+                    </div>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td class="comment-cell">17 mai</td>
+                  <td>
+                    <div class="intensive-list">
+                      <div class="intensive-item" style="--ue-color: var(--ue-neutral)"><strong>Lundi de Pentecôte</strong></div>
+                    </div>
+                  </td>
+                </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      
+            
+              <div class="block-title">Stage et suivi de mémoire</div>
+              <p class="notice">Aucune ligne stage / suivi de mémoire renseignée pour ce semestre.</p>
+            
+        </section>
+      
+        
+        <section class="data-section" id="ec-directory">
+          <div class="section-heading">
+            <div>
+              <h2>Liste des EC</h2>
+            </div>
+          </div>
+          <div class="hours-panel" id="hoursPanel">
+            <p class="hours-total"><strong>612</strong> vh compté(s)</p>
+            <p class="hours-note">24 EC sélectionné(s) sur 24. Le total utilise <code>nb_heures</code> ; si la cellule est vide, il utilise la durée <code>heure_debut</code> → <code>heure_fin</code>.</p>
+          </div>
+          <div class="table-wrap ec-table-wrap">
+            <table class="ec-table">
+              <colgroup>
+                <col class="semester-col">
+                <col class="title-col">
+                <col class="code-col">
+                <col class="teacher-col">
+                <col class="hours-col">
+                <col class="count-col">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th><button class="sort-button" type="button" data-sort-key="semestre"><span>Semestre</span><span class="sort-mark">▲</span></button></th>
+                  <th><button class="sort-button" type="button" data-sort-key="ec"><span>EC</span><span class="sort-mark"></span></button></th>
+                  <th><button class="sort-button" type="button" data-sort-key="code"><span>Code</span><span class="sort-mark"></span></button></th>
+                  <th><button class="sort-button" type="button" data-sort-key="enseignants"><span>Enseignant(s)</span><span class="sort-mark"></span></button></th>
+                  <th><button class="sort-button" type="button" data-sort-key="nb_heures"><span>vh</span><span class="sort-mark"></span></button></th>
+                  <th class="check-head">
+                    <label class="select-all-label" title="Tout cocher / tout décocher">
+                      <span>#</span>
+                      <input type="checkbox" id="selectAllEc" aria-label="Tout cocher ou tout décocher pour le calcul du volume horaire" checked="checked">
+                    </label>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">Approches transversales des humanités numériques (jeudi)</td>
+          <td>DMA1EDA1</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Everardo REYES</span></div></td>
+          <td class="hours-cell">6</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-20" aria-label="Compter Approches transversales des humanités numériques (jeudi)" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">Approches transversales des humanités numériques (mardi)</td>
+          <td>DMA1EDA1</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Samuel DA SILVA</span></div></td>
+          <td class="hours-cell">6</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-19" aria-label="Compter Approches transversales des humanités numériques (mardi)" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">Atelier image Illustrator-photoshop</td>
+          <td>DMA1EDA5</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">John MOTTA</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-10" aria-label="Compter Atelier image Illustrator-photoshop" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">Atelier Introduction à la 3D</td>
+          <td>DMA1EDA6</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Noémie SCHERER</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-21" aria-label="Compter Atelier Introduction à la 3D" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">BDDR (Pratique)</td>
+          <td>DMA1EDA4</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Nasreddine BOUHAÏ</span></div></td>
+          <td class="hours-cell">15</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-3" aria-label="Compter BDDR (Pratique)" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">BDDR (Théorie)</td>
+          <td>DMA1EDA4</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Nasreddine BOUHAÏ</span></div></td>
+          <td class="hours-cell">15</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-5" aria-label="Compter BDDR (Théorie)" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">Conception UI</td>
+          <td>DMA1EDA9</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Marie LE ROCH</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-2" aria-label="Compter Conception UI" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">Design d’interfaces interactives</td>
+          <td>DMA1EDAB</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Rodolphe RICHARD</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-23" aria-label="Compter Design d’interfaces interactives" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">Économie et droit du numérique</td>
+          <td>DMA1EDA2</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Matthieu QUINIOU</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-24" aria-label="Compter Économie et droit du numérique" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">Editorialisation et stratégie de contenu</td>
+          <td>DMA1EDA8</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Arnaud LABORDERIE</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-8" aria-label="Compter Editorialisation et stratégie de contenu" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">Graphisme et design d'interface</td>
+          <td>DMA1EDAC</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">John MOTTA</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-9" aria-label="Compter Graphisme et design d'interface" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">Interaction 3D (Unity)</td>
+          <td>DMA1EDA9</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Stéphan TWAROG</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-22" aria-label="Compter Interaction 3D (Unity)" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">Narrations interactives</td>
+          <td>DMA1EDA8</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Didier LAURET</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-1" aria-label="Compter Narrations interactives" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">Programmation créative (après-midi)</td>
+          <td>DMA1EDA3</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Samuel DA SILVA</span></div></td>
+          <td class="hours-cell">15</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-6" aria-label="Compter Programmation créative (après-midi)" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">Programmation créative (matin)</td>
+          <td>DMA1EDA3</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Laure LEROY</span></div></td>
+          <td class="hours-cell">15</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-4" aria-label="Compter Programmation créative (matin)" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 1</td>
+          <td class="ec-title-cell">Web Graphique</td>
+          <td>DMA1EDA7</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Everardo REYES</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-7" aria-label="Compter Web Graphique" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 2</td>
+          <td class="ec-title-cell">After Effects</td>
+          <td>DMA2EDA3</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Stéphan TWAROG</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-18" aria-label="Compter After Effects" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 2</td>
+          <td class="ec-title-cell">Animation 2D et vidéo</td>
+          <td>DMA2EDA9</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Laurent LACOMBE</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-13" aria-label="Compter Animation 2D et vidéo" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 2</td>
+          <td class="ec-title-cell">Asp édit réalisation multimédia</td>
+          <td>DMA2EDAA</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Laure LEROY</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-14" aria-label="Compter Asp édit réalisation multimédia" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 2</td>
+          <td class="ec-title-cell">Concep et gest de proj num</td>
+          <td>DMA2EDA2</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Nicolas SAURET</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-15" aria-label="Compter Concep et gest de proj num" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 2</td>
+          <td class="ec-title-cell">Direction artistique</td>
+          <td>DMA2EDA7</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">John MOTTA</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-12" aria-label="Compter Direction artistique" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 2</td>
+          <td class="ec-title-cell">Immersion et interaction</td>
+          <td>DMA2EDA1</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Laure LEROY</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-16" aria-label="Compter Immersion et interaction" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 2</td>
+          <td class="ec-title-cell">Interaction appliquée</td>
+          <td>DMA2EDA5</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Laure LEROY</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-17" aria-label="Compter Interaction appliquée" checked="checked"></td>
+        </tr>
+      
+        <tr>
+          <td>Semestre 2</td>
+          <td class="ec-title-cell">Suivi dév et intégration</td>
+          <td>DMA2EDA6</td>
+          <td class="teacher-cell"><div class="teacher-list"><span class="teacher-name">Samuel DA SILVA</span></div></td>
+          <td class="hours-cell">30</td>
+          <td class="check-cell"><input class="ec-check" type="checkbox" data-ec-id="ec-11" aria-label="Compter Suivi dév et intégration" checked="checked"></td>
+        </tr>
+      
+              </tbody>
+            </table>
+          </div>
+        </section>
+      
+      </main>
 
     <footer>
       <p class="footer-title">M1 Création et expérience numériques</p>
@@ -2304,5 +3011,6 @@
       return escapeHtml(String(value ?? "").replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\ufffe\uffff]/g, " "));
     }
   </script>
-</body>
-</html>
+
+
+</body></html>
